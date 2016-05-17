@@ -1,0 +1,62 @@
+
+tiles.png
+size: 512,256
+format: RGBA8888
+filter: MipMapLinearLinear,MipMapLinearLinear
+repeat: none
+blue
+  rotate: false
+  xy: 2, 93
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+brown
+  rotate: false
+  xy: 2, 2
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+green
+  rotate: false
+  xy: 69, 93
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+grey
+  rotate: false
+  xy: 69, 2
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+purple
+  rotate: false
+  xy: 136, 93
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+red
+  rotate: false
+  xy: 136, 2
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+tan
+  rotate: false
+  xy: 203, 93
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
+white
+  rotate: false
+  xy: 203, 2
+  size: 65, 89
+  orig: 65, 89
+  offset: 0, 0
+  index: -1
