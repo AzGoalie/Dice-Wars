@@ -36,7 +36,11 @@ public class MapRenderer {
             if (hexagon.getSatelliteData().isPresent()) {
                 HexData data = (HexData) hexagon.getSatelliteData().get();
 
-                shapeRenderer.setColor(COLORS[data.team]);
+                if (data.highlight) {
+                    shapeRenderer.setColor(Color.RED);
+                } else {
+                    shapeRenderer.setColor(COLORS[data.team]);
+                }
 
                 List<Point> points = new ArrayList<>();
                 points.add(Point.fromPosition(hexagon.getCenterX(), hexagon.getCenterY()));

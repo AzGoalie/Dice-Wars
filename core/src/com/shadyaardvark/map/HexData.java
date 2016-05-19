@@ -6,4 +6,5 @@ public class HexData extends DefaultSatelliteData {
     public static final int INVALID = -1;
     public int team = INVALID;
     public int region = INVALID;
+    public boolean highlight = false;
 }
