@@ -8,14 +8,13 @@ import com.shadyaardvark.map.HexData;
 import com.shadyaardvark.map.MapGenerator;
 import com.shadyaardvark.map.MapRenderer;
 import com.shadyaardvark.map.OutlineRenderer;
+import org.codetome.hexameter.core.api.Hexagon;
+import org.codetome.hexameter.core.api.HexagonalGrid;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.codetome.hexameter.core.api.Hexagon;
-import org.codetome.hexameter.core.api.HexagonalGrid;
 
 public class GameBoard {
     private int width;
@@ -39,8 +38,9 @@ public class GameBoard {
         generator.print();
 
         grid = generator.getGrid();
-
         regionMap.clear();
+
+        // Add each hexagon to its region
         grid.getHexagons().forEach(hexagon -> {
             if (hexagon.getSatelliteData().isPresent()) {
                 HexData data = (HexData) hexagon.getSatelliteData().get();
@@ -48,27 +48,23 @@ public class GameBoard {
 
                 Region region = regionMap.get(data.region);
                 region.region = data.region;
+                region.regionHexagons.add(hexagon);
+            }
+        });
 
-                // For each hexagon, get it's neighbors
-                // If the neighbor is in a different region
-                // ------ add neighboring region to list of neighbors
-                // ------ add hexagon to list of neighboring hexagons
-                // ------ add neighbors of same region as neighbor
+        // Add all neighbors to a region
+        grid.getHexagons().forEach(hexagon -> {
+            if (hexagon.getSatelliteData().isPresent()) {
+                HexData data = (HexData) hexagon.getSatelliteData().get();
+                Region region = regionMap.get(data.region);
+
                 grid.getNeighborsOf(hexagon).forEach(neighbor -> {
                     if (neighbor.getSatelliteData().isPresent()) {
-                        HexData neighborData = (HexData)neighbor.getSatelliteData().get();
-                        if (neighborData.region != data.region) {
-                            region.neighboringRegions.add(neighborData.region);
+                        HexData neighborData = (HexData) neighbor.getSatelliteData().get();
 
-                            region.neighboringHexagons.add(neighbor);
-                            grid.getNeighborsOf(neighbor).forEach(neighborNeighbor -> {
-                                if (neighborNeighbor.getSatelliteData().isPresent()) {
-                                    HexData neighborsNeighborData = (HexData) neighborNeighbor.getSatelliteData().get();
-                                    if (neighborsNeighborData.region == neighborData.region) {
-                                        region.neighboringHexagons.add(neighborNeighbor);
-                                    }
-                                }
-                            });
+                        if (data.region != neighborData.region) {
+                            region.neighboringRegions.add(neighborData.region);
+                            region.neighboringHexagons.addAll(regionMap.get(neighborData.region).regionHexagons);
                         }
                     }
                 });
@@ -126,5 +122,6 @@ public class GameBoard {
         int region;
         Set<Integer> neighboringRegions = new HashSet<>();
         Set<Hexagon> neighboringHexagons = new HashSet<>();
+        Set<Hexagon> regionHexagons = new HashSet<>();
     }
 }
