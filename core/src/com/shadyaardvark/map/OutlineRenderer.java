@@ -16,13 +16,11 @@ public class OutlineRenderer {
     private ShapeRenderer shapeRenderer;
     private Set<Line> outlines;
 
-    private Array<Hexagon> padding;
-
     public OutlineRenderer(HexagonMap map) {
         shapeRenderer = new ShapeRenderer();
         outlines = new HashSet<>();
 
-        padding = new Array<>();
+        Array<Hexagon> padding = new Array<>();
         for (int x = -1; x <= map.getWidth(); x++) {
             for (int y = -1; y <= map.getHeight(); y++) {
                 if (x == -1 || x == map.getWidth() || y == -1 || y == map.getHeight()) {
@@ -94,9 +92,8 @@ public class OutlineRenderer {
         }
     }
 
-    class Line {
+    private class Line {
         private Vector2 start;
-
         private Vector2 end;
     }
 }

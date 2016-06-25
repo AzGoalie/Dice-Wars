@@ -2,6 +2,7 @@ package com.shadyaardvark.map;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -12,26 +13,30 @@ public class Hexagon {
     private int team = INVALID;
     private int region = INVALID;
     private boolean highlight = false;
-    private Vector2 position = new Vector2(INVALID, INVALID);
+    private final AxialCoordinate position;
     private int size = INVALID;
 
+    private final float hexWidth;
+    private final float hexHeight;
+
     public Hexagon(int x, int y, int size) {
-        setX(x);
-        setY(y);
+        position = AxialCoordinate.offsetToAxial(x, y);
         setSize(size);
+
+        hexWidth = (float) (sqrt(3) * size);
+        hexHeight = size * 3 / 2;
     }
 
     public Array<Vector2> getPoints() {
         Array<Vector2> points = new Array<>();
 
-        points.add(position);
+        points.add(getCenter());
         for (int i = 0; i < 6; i++) {
-            double angle = 2 * Math.PI / 6 * (i + 0.5f);
-            float x = (float) (position.x + size * cos(angle));
-            float y = (float) (position.y + size * sin(angle));
+            double angle = 2 * Math.PI / 6 * (i + 0.5);
+            float x = (float) (getCenter().x + size * cos(angle));
+            float y = (float) (getCenter().y + size * sin(angle));
             points.add(new Vector2(x, y));
         }
-
         return points;
     }
 
@@ -47,16 +52,16 @@ public class Hexagon {
         return highlight;
     }
 
-    public Vector2 getPosition() {
+    public AxialCoordinate getPosition() {
         return position;
     }
 
-    public int getX() {
-        return (int) position.x;
+    public float getQ() {
+        return position.getQ();
     }
 
-    public int getY() {
-        return (int) position.y;
+    public float getR() {
+        return position.getR();
     }
 
     public int getSize() {
@@ -75,20 +80,17 @@ public class Hexagon {
         this.highlight = highlight;
     }
 
-    public void setX(int x) {
-        position.x = x;
-    }
-
-    public void setY(int y) {
-        position.y = y;
-    }
-
     public void setSize(int size) {
         this.size = size;
     }
 
     public boolean isValid() {
-        return team != INVALID && region != INVALID && position.x != INVALID
-                && position.y != INVALID;
+        return team != INVALID && region != INVALID && position != null;
+    }
+
+    public Vector2 getCenter() {
+        float x = position.getQ() * hexWidth + position.getR() * hexWidth / 2 + hexWidth / 2;
+        float y = position.getR() * hexHeight + size;
+        return new Vector2(x, y);
     }
 }

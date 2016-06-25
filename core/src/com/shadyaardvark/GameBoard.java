@@ -20,7 +20,6 @@ public class GameBoard {
     private MapRenderer mapRenderer;
     private OutlineRenderer outlines;
 
-    private HexagonMap map;
     private Map<Integer, Region> regionMap;
 
     public GameBoard(int width, int height) {
@@ -32,7 +31,7 @@ public class GameBoard {
     public void createMap(int numPlayers) {
         MapGenerator generator = new MapGenerator(width, height);
 
-        map = generator.generate(numPlayers);
+        HexagonMap map = generator.generate(numPlayers);
         generator.print();
 
         regionMap.clear();
@@ -113,9 +112,7 @@ public class GameBoard {
         int region;
 
         Set<Integer> neighboringRegions = new HashSet<>();
-
         Set<Hexagon> neighboringHexagons = new HashSet<>();
-
         Set<Hexagon> regionHexagons = new HashSet<>();
     }
 }

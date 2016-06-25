@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class MapGenerator {
@@ -24,7 +23,7 @@ public class MapGenerator {
 
         // Generate Map
         int numFilled = 0;
-        Vector2 currentPos = new Vector2(width / 2, height / 2);
+        AxialCoordinate currentPos = AxialCoordinate.offsetToAxial(width / 2, height / 2);
         while (numFilled <= width * height * PERCENT_FILLED) {
             Hexagon hexagon = map.getHexagon(currentPos);
             hexagon.setTeam(GENERATING);
@@ -38,7 +37,8 @@ public class MapGenerator {
         int region = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Hexagon hexagon = map.getHexagon(x, y);
+                AxialCoordinate coordinate = AxialCoordinate.offsetToAxial(x, y);
+                Hexagon hexagon = map.getHexagon(coordinate);
                 if (hexagon.isValid() && (hexagon.getRegion() == GENERATING)) {
                     hexagon.setRegion(region);
                     hexagon.setTeam(region % numPlayers);
@@ -56,7 +56,7 @@ public class MapGenerator {
         return map;
     }
 
-    private Vector2 getNextFree(Hexagon hexagon) {
+    private AxialCoordinate getNextFree(Hexagon hexagon) {
         Array<Hexagon> neighbors = map.getNeighborsOf(hexagon);
         neighbors.shuffle();
 
@@ -70,7 +70,7 @@ public class MapGenerator {
         // No neighbors were free, get next free hexagon
         Set<Hexagon> hexagons = new HashSet<>();
         for (Hexagon hex : map.getHexagons()) {
-            hexagons.addAll(Arrays.asList(getAdjacent(hexagon, false).toArray()));
+            hexagons.addAll(Arrays.asList(getAdjacent(hex, false).toArray()));
         }
 
         return hexagons.iterator()
@@ -98,7 +98,8 @@ public class MapGenerator {
 
         for (int y = height - 1; y >= 0; y--) {
             for (int x = 0; x < width; x++) {
-                Hexagon hexagon = map.getHexagon(x, y);
+                AxialCoordinate coordinate = AxialCoordinate.offsetToAxial(x, y);
+                Hexagon hexagon = map.getHexagon(coordinate);
 
                 if (hexagon.isValid()) {
                     System.out.print(hexagon.getRegion() + " ");
