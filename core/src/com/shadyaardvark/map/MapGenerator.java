@@ -1,25 +1,28 @@
 package com.shadyaardvark.map;
 
+import com.badlogic.gdx.utils.Array;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.badlogic.gdx.utils.Array;
-
 public class MapGenerator {
     private static final int GENERATING = -2;
     private static final float PERCENT_FILLED = 0.75f;
     private static final int RADIUS = 32;
+
+    private int width;
+    private int height;
     private HexagonMap map;
 
     public MapGenerator(int width, int height) {
-        map = new HexagonMap(width, height, RADIUS);
+        this.width = width;
+        this.height = height;
     }
 
     public HexagonMap generate(int numPlayers) {
-        int width = map.getWidth();
-        int height = map.getHeight();
+        map = new HexagonMap(width, height, RADIUS);
 
         // Generate Map
         int numFilled = 0;
@@ -39,7 +42,7 @@ public class MapGenerator {
             for (int y = 0; y < height; y++) {
                 AxialCoordinate coordinate = AxialCoordinate.offsetToAxial(x, y);
                 Hexagon hexagon = map.getHexagon(coordinate);
-                if (hexagon.isValid() && (hexagon.getRegion() == GENERATING)) {
+                if (hexagon.isValid() && hexagon.getRegion() == GENERATING) {
                     hexagon.setRegion(region);
                     hexagon.setTeam(region % numPlayers);
                     Array<Hexagon> adj = getAdjacent(hexagon, true);

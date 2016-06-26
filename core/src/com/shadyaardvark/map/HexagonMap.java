@@ -1,9 +1,9 @@
 package com.shadyaardvark.map;
 
+import com.badlogic.gdx.utils.Array;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.badlogic.gdx.utils.Array;
 
 public class HexagonMap {
     private static final int[][] NEIGHBORS = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};

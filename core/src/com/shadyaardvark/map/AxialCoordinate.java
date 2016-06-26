@@ -19,8 +19,8 @@ public class AxialCoordinate extends Vector2 {
         return y;
     }
 
-    public static AxialCoordinate offsetToAxial(float x, float y) {
-        float q = x - (y + (y % 2)) / 2;
+    public static AxialCoordinate offsetToAxial(int x, int y) {
+        int q = x - y / 2;
         return new AxialCoordinate(q, y);
     }
 }
