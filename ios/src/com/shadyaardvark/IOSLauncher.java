@@ -14,7 +14,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
         config.preferredFramesPerSecond = Settings.FPS;
 
         if (Settings.MSAA) {
-            config.multisample = GLKViewDrawableMultisample.valueOf(Settings.SAMPLES);
+            config.multisample = GLKViewDrawableMultisample._4X;
         }
 
         return new IOSApplication(new DiceWars(), config);
