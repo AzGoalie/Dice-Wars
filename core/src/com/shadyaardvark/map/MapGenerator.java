@@ -73,7 +73,9 @@ public class MapGenerator {
         // No neighbors were free, get next free hexagon
         Set<Hexagon> hexagons = new HashSet<>();
         for (Hexagon hex : map.getHexagons()) {
-            hexagons.addAll(Arrays.asList(getAdjacent(hex, false).toArray()));
+            if (hex.isValid()) {
+                hexagons.addAll(Arrays.asList(getAdjacent(hex, false).toArray()));
+            }
         }
 
         return hexagons.iterator()
