@@ -1,6 +1,5 @@
 package com.shadyaardvark.map;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -73,14 +72,19 @@ public class OutlineRenderer {
     }
 
     private void createLines(Array<Vector2> p1, Array<Vector2> p2) {
-        Set<Vector2> s1 = new HashSet<>();
-        Set<Vector2> s2 = new HashSet<>();
+        Set<Point> s1 = new HashSet<>();
+        Set<Point> s2 = new HashSet<>();
 
-        s1.addAll(Arrays.asList(p1.toArray()));
-        s2.addAll(Arrays.asList(p2.toArray()));
+        for (Vector2 v : p1) {
+            s1.add(new Point(v));
+        }
+
+        for (Vector2 v : p2) {
+            s2.add(new Point(v));
+        }
         s1.retainAll(s2);
 
-        Iterator<Vector2> iter = s1.iterator();
+        Iterator<Point> iter = s1.iterator();
         while (iter.hasNext()) {
             Line line = new Line();
             line.start = iter.next();
@@ -93,7 +97,37 @@ public class OutlineRenderer {
     }
 
     private class Line {
-        private Vector2 start;
-        private Vector2 end;
+        private Point start;
+        private Point end;
+    }
+
+    /**
+     * This is used because Vector2 uses floats and they don't work properly with HashSets
+     * Basically used for truncation / casting. If the Hexagon.getPoints was changed instead
+     * then there would be ugly artifacts when rendering the map.
+     */
+    private class Point {
+        int x;
+        int y;
+
+        public Point(Vector2 v) {
+            this.x = (int) v.x;
+            this.y = (int) v.y;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Point)) return false;
+            Point point = (Point) obj;
+            return x == point.x && y == point.y;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = x;
+            result = 31 * result + y;
+            return result;
+        }
     }
 }

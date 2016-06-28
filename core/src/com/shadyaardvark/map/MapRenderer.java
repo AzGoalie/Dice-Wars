@@ -53,6 +53,10 @@ public class MapRenderer {
         shapeRenderer.end();
     }
 
+    public void setMap(HexagonMap map) {
+        this.map = map;
+    }
+
     public void dispose() {
         shapeRenderer.dispose();
     }
