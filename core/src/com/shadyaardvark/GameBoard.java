@@ -15,25 +15,19 @@ import com.shadyaardvark.map.MapRenderer;
 import com.shadyaardvark.map.OutlineRenderer;
 
 public class GameBoard {
-    private int width;
-    private int height;
-
     private MapRenderer mapRenderer;
     private OutlineRenderer outlines;
 
     private Map<Integer, Region> regionMap;
 
-    public GameBoard(int width, int height) {
-        this.width = width;
-        this.height = height;
+    public GameBoard() {
         regionMap = new HashMap<>();
     }
 
-    public void createMap(int numPlayers) {
+    public void createMap(int width, int height, int numPlayers) {
         MapGenerator generator = new MapGenerator(width, height);
 
         HexagonMap map = generator.generate(numPlayers);
-        generator.print();
 
         regionMap.clear();
 
@@ -76,38 +70,6 @@ public class GameBoard {
         mapRenderer.render(camera);
         outlines.render(camera);
     }
-
-    //    public Hexagon getHexagonFromScreen(int x, int y, OrthographicCamera camera) {
-    //        Vector3 pos = camera.unproject(new Vector3(x, y, 0));
-    //        if (grid.getByPixelCoordinate(pos.x, pos.y).isPresent()) {
-    //            return grid.getByPixelCoordinate(pos.x, pos.y)
-    //                    .get();
-    //        } else {
-    //            return null;
-    //        }
-    //    }
-    //
-    //    public Array<Hexagon> getNeighborRegionHexagons(Hexagon hexagon) {
-    //        Array<Hexagon> neighbors = new Array<>();
-    //
-    //        if (hexagon.getSatelliteData().isPresent()) {
-    //            HexData data = (HexData) hexagon.getSatelliteData().get();
-    //            regionMap.get(data.region).neighboringHexagons.forEach(neighbors::add);
-    //        }
-    //
-    //        return neighbors;
-    //    }
-    //
-    //    public IntArray getNeighborRegions(Hexagon hexagon) {
-    //        IntArray neighbors = new IntArray();
-    //
-    //        if (hexagon.getSatelliteData().isPresent()) {
-    //            HexData data = (HexData) hexagon.getSatelliteData().get();
-    //            regionMap.get(data.region).neighboringRegions.forEach(neighbors::add);
-    //        }
-    //
-    //        return neighbors;
-    //    }
 
     public void dispose() {
         outlines.dispose();
