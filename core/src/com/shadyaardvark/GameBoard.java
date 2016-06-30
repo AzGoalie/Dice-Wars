@@ -30,28 +30,20 @@ public class GameBoard {
 
         regionMap.clear();
 
-        // Add each hexagon to its region
         for (Hexagon hexagon : map.getHexagons()) {
             if (hexagon.isValid()) {
                 Region region = new Region();
                 region.region = hexagon.getRegion();
                 region.regionHexagons.add(hexagon);
 
-                regionMap.put(hexagon.getRegion(), region);
-            }
-        }
-
-        // Add all neighbors to a region
-        for (Hexagon hexagon : map.getHexagons()) {
-            if (hexagon.isValid()) {
-                Region region = regionMap.get(hexagon.getRegion());
                 Array<Hexagon> neighbors = map.getNeighborsOf(hexagon);
                 for (Hexagon neighbor : neighbors) {
                     if (neighbor.isValid() && hexagon.getRegion() != neighbor.getRegion()) {
                         region.neighboringRegions.add(neighbor.getRegion());
-                        region.neighboringHexagons.add(neighbor);
                     }
                 }
+
+                regionMap.put(hexagon.getRegion(), region);
             }
         }
 
@@ -74,7 +66,6 @@ public class GameBoard {
         int region;
 
         Set<Integer> neighboringRegions = new HashSet<>();
-        Set<Hexagon> neighboringHexagons = new HashSet<>();
         Set<Hexagon> regionHexagons = new HashSet<>();
     }
 }

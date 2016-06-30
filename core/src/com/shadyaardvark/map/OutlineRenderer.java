@@ -1,13 +1,11 @@
 package com.shadyaardvark.map;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -36,10 +34,10 @@ public class OutlineRenderer {
                 for (Hexagon neighbor : neighbors) {
                     if (neighbor.isValid()) {
                         if (neighbor.getRegion() != hexagon.getRegion()) {
-                            createLines(hexagon.getPoints(), neighbor.getPoints());
+                            createLine(hexagon.getPoints(), neighbor.getPoints());
                         }
                     } else {
-                        createLines(hexagon.getPoints(), neighbor.getPoints());
+                        createLine(hexagon.getPoints(), neighbor.getPoints());
                     }
                 }
             }
@@ -49,7 +47,7 @@ public class OutlineRenderer {
             Array<Hexagon> neighbors = map.getNeighborsOf(hexagon);
             for (Hexagon neighbor : neighbors) {
                 if (neighbor.isValid()) {
-                    createLines(hexagon.getPoints(), neighbor.getPoints());
+                    createLine(hexagon.getPoints(), neighbor.getPoints());
                 }
             }
         }
@@ -72,33 +70,28 @@ public class OutlineRenderer {
         shapeRenderer.dispose();
     }
 
-    private void createLines(Array<Vector2> p1, Array<Vector2> p2) {
-        Set<GridPoint2> s1 = new HashSet<>();
-        Set<GridPoint2> s2 = new HashSet<>();
-
-        for (Vector2 v : p1) {
-            s1.add(new GridPoint2((int) v.x, (int) v.y));
-        }
-
-        for (Vector2 v : p2) {
-            s2.add(new GridPoint2((int) v.x, (int) v.y));
-        }
-        s1.retainAll(s2);
-
-        Iterator<GridPoint2> iter = s1.iterator();
-        while (iter.hasNext()) {
-            Line line = new Line();
-            line.start = iter.next();
-
-            if (iter.hasNext()) {
-                line.end = iter.next();
-                outlines.add(line);
+    private void createLine(Array<Vector2> hexagon1, Array<Vector2> hexagon2) {
+        Line line = new Line();
+        for (Vector2 p1 : hexagon1) {
+            for (Vector2 p2 : hexagon2) {
+                if (p1.epsilonEquals(p2, .1f)) {
+                    line.add(p1);
+                }
             }
         }
+        outlines.add(line);
     }
 
     private class Line {
-        private GridPoint2 start;
-        private GridPoint2 end;
+        private Vector2 start;
+        private Vector2 end;
+
+        void add(Vector2 point) {
+            if (start == null) {
+                start = point;
+            } else {
+                end = point;
+            }
+        }
     }
 }
