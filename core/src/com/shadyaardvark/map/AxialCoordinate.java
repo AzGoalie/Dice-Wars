@@ -1,21 +1,21 @@
 package com.shadyaardvark.map;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.GridPoint2;
 
-public class AxialCoordinate extends Vector2 {
+public class AxialCoordinate extends GridPoint2 {
     public AxialCoordinate() {
         super();
     }
 
-    public AxialCoordinate(float q, float r) {
+    public AxialCoordinate(int q, int r) {
         super(q, r);
     }
 
-    public float getQ() {
+    public int getQ() {
         return x;
     }
 
-    public float getR() {
+    public int getR() {
         return y;
     }
 

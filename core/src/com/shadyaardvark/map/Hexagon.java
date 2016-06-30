@@ -56,11 +56,11 @@ public class Hexagon {
         return position;
     }
 
-    public float getQ() {
+    public int getQ() {
         return position.getQ();
     }
 
-    public float getR() {
+    public int getR() {
         return position.getR();
     }
 

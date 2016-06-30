@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
 import com.shadyaardvark.map.Hexagon;
@@ -61,11 +60,6 @@ public class GameBoard {
     }
 
     public void render(OrthographicCamera camera) {
-        if (Gdx.input.justTouched()) {
-            HexagonMap map = new MapGenerator(10, 10).generate(5);
-            mapRenderer.setMap(map);
-            outlines = new OutlineRenderer(map);
-        }
         camera.update();
         mapRenderer.render(camera);
         outlines.render(camera);

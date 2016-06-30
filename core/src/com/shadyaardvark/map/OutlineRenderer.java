@@ -7,6 +7,7 @@ import java.util.Set;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -72,19 +73,19 @@ public class OutlineRenderer {
     }
 
     private void createLines(Array<Vector2> p1, Array<Vector2> p2) {
-        Set<Point> s1 = new HashSet<>();
-        Set<Point> s2 = new HashSet<>();
+        Set<GridPoint2> s1 = new HashSet<>();
+        Set<GridPoint2> s2 = new HashSet<>();
 
         for (Vector2 v : p1) {
-            s1.add(new Point(v));
+            s1.add(new GridPoint2((int) v.x, (int) v.y));
         }
 
         for (Vector2 v : p2) {
-            s2.add(new Point(v));
+            s2.add(new GridPoint2((int) v.x, (int) v.y));
         }
         s1.retainAll(s2);
 
-        Iterator<Point> iter = s1.iterator();
+        Iterator<GridPoint2> iter = s1.iterator();
         while (iter.hasNext()) {
             Line line = new Line();
             line.start = iter.next();
@@ -97,37 +98,7 @@ public class OutlineRenderer {
     }
 
     private class Line {
-        private Point start;
-        private Point end;
-    }
-
-    /**
-     * This is used because Vector2 uses floats and they don't work properly with HashSets
-     * Basically used for truncation / casting. If the Hexagon.getPoints was changed instead
-     * then there would be ugly artifacts when rendering the map.
-     */
-    private class Point {
-        int x;
-        int y;
-
-        public Point(Vector2 v) {
-            this.x = (int) v.x;
-            this.y = (int) v.y;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof Point)) return false;
-            Point point = (Point) obj;
-            return x == point.x && y == point.y;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = x;
-            result = 31 * result + y;
-            return result;
-        }
+        private GridPoint2 start;
+        private GridPoint2 end;
     }
 }

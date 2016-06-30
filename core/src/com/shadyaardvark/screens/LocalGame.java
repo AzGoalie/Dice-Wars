@@ -34,6 +34,10 @@ public class LocalGame implements Screen {
         Gdx.gl.glClearColor(.3f, .3f, .3f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (Gdx.input.justTouched()) {
+            map.createMap(Settings.MAP_WIDTH, Settings.MAP_HEIGHT, 5);
+        }
+
         camera.update();
         map.render(camera);
     }

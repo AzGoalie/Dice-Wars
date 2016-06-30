@@ -1,9 +1,9 @@
 package com.shadyaardvark.map;
 
-import com.badlogic.gdx.utils.Array;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.badlogic.gdx.utils.Array;
 
 public class HexagonMap {
     private static final int[][] NEIGHBORS = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
@@ -46,8 +46,8 @@ public class HexagonMap {
         Array<Hexagon> neighbors = new Array<>();
         for (int[] neighbor : NEIGHBORS) {
             Hexagon hex;
-            float q = hexagon.getQ() + neighbor[0];
-            float r = hexagon.getR() + neighbor[1];
+            int q = hexagon.getQ() + neighbor[0];
+            int r = hexagon.getR() + neighbor[1];
             AxialCoordinate neighborCoordinate = new AxialCoordinate(q, r);
             if (map.keySet()
                     .contains(neighborCoordinate)) {
