@@ -16,12 +16,14 @@ public class LocalGame implements Screen {
     public LocalGame(Game game) {
         this.game = game;
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
         map = new GameBoard();
         //TODO: make number of players configurable
         map.createMap(Settings.MAP_WIDTH, Settings.MAP_HEIGHT, 5);
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false,
+                map.getHexWidth() * (Settings.MAP_WIDTH + 1),
+                map.getHexHeight() * (Settings.MAP_HEIGHT + 1));
     }
 
     @Override
@@ -44,7 +46,6 @@ public class LocalGame implements Screen {
 
     @Override
     public void resize(int width, int height) {
-//        camera.setToOrtho(false, width, height);
     }
 
     @Override

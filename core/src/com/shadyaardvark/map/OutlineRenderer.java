@@ -20,7 +20,7 @@ public class OutlineRenderer {
         for (int x = -1; x <= map.getWidth(); x++) {
             for (int y = -1; y <= map.getHeight(); y++) {
                 if (x == -1 || x == map.getWidth() || y == -1 || y == map.getHeight()) {
-                    padding.add(new Hexagon(x, y, map.getHexSize()));
+                    padding.add(new Hexagon(x, y, map.getHexRadius()));
                 }
             }
         }

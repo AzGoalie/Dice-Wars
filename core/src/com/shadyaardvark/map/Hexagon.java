@@ -93,4 +93,12 @@ public class Hexagon {
         float y = position.getR() * hexHeight + size;
         return new Vector2(x, y);
     }
+
+    public float getWidth() {
+        return hexWidth;
+    }
+
+    public float getHeight() {
+        return hexHeight;
+    }
 }

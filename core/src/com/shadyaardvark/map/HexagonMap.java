@@ -9,18 +9,18 @@ public class HexagonMap {
     private ObjectMap<AxialCoordinate, Hexagon> map;
     private int width;
     private int height;
-    private int hexSize;
+    private int hexRadius;
 
-    public HexagonMap(int width, int height, int hexSize) {
+    public HexagonMap(int width, int height, int hexRadius) {
         this.width = width;
         this.height = height;
-        this.hexSize = hexSize;
+        this.hexRadius = hexRadius;
 
         map = new ObjectMap<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Hexagon hexagon = new Hexagon(x, y, hexSize);
+                Hexagon hexagon = new Hexagon(x, y, hexRadius);
                 map.put(AxialCoordinate.offsetToAxial(x, y), hexagon);
             }
         }
@@ -63,7 +63,7 @@ public class HexagonMap {
         return height;
     }
 
-    public int getHexSize() {
-        return hexSize;
+    public int getHexRadius() {
+        return hexRadius;
     }
 }

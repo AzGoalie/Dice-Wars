@@ -14,8 +14,10 @@ import com.shadyaardvark.map.OutlineRenderer;
 public class GameBoard {
     private MapRenderer mapRenderer;
     private OutlineRenderer outlines;
-
     private IntMap<Region> regionMap;
+
+    private float hexWidth;
+    private float hexHeight;
 
     public GameBoard() {
         regionMap = new IntMap<>();
@@ -45,6 +47,9 @@ public class GameBoard {
             }
         }
 
+        hexWidth = map.getHexagons().first().getWidth();
+        hexHeight = map.getHexagons().first().getHeight();
+
         mapRenderer = new MapRenderer(map);
         outlines = new OutlineRenderer(map);
     }
@@ -58,6 +63,14 @@ public class GameBoard {
     public void dispose() {
         outlines.dispose();
         mapRenderer.dispose();
+    }
+
+    public float getHexWidth() {
+        return hexWidth;
+    }
+
+    public float getHexHeight() {
+        return hexHeight;
     }
 
     private class Region {
