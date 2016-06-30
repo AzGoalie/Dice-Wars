@@ -1,12 +1,10 @@
 package com.shadyaardvark;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.shadyaardvark.map.Hexagon;
 import com.shadyaardvark.map.HexagonMap;
 import com.shadyaardvark.map.MapGenerator;
@@ -17,10 +15,10 @@ public class GameBoard {
     private MapRenderer mapRenderer;
     private OutlineRenderer outlines;
 
-    private Map<Integer, Region> regionMap;
+    private IntMap<Region> regionMap;
 
     public GameBoard() {
-        regionMap = new HashMap<>();
+        regionMap = new IntMap<>();
     }
 
     public void createMap(int width, int height, int numPlayers) {
@@ -65,7 +63,7 @@ public class GameBoard {
     private class Region {
         int region;
 
-        Set<Integer> neighboringRegions = new HashSet<>();
-        Set<Hexagon> regionHexagons = new HashSet<>();
+        IntSet neighboringRegions = new IntSet();
+        ObjectSet<Hexagon> regionHexagons = new ObjectSet<>();
     }
 }

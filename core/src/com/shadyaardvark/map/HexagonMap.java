@@ -1,14 +1,12 @@
 package com.shadyaardvark.map;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class HexagonMap {
     private static final int[][] NEIGHBORS = {{1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}, {0, 1}};
 
-    private Map<AxialCoordinate, Hexagon> map;
+    private ObjectMap<AxialCoordinate, Hexagon> map;
     private int width;
     private int height;
     private int hexSize;
@@ -18,7 +16,7 @@ public class HexagonMap {
         this.height = height;
         this.hexSize = hexSize;
 
-        map = new HashMap<>();
+        map = new ObjectMap<>();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -49,8 +47,7 @@ public class HexagonMap {
             int q = hexagon.getQ() + neighbor[0];
             int r = hexagon.getR() + neighbor[1];
             AxialCoordinate neighborCoordinate = new AxialCoordinate(q, r);
-            if (map.keySet()
-                    .contains(neighborCoordinate)) {
+            if (map.containsKey(neighborCoordinate)) {
                 hex = map.get(neighborCoordinate);
                 neighbors.add(hex);
             }

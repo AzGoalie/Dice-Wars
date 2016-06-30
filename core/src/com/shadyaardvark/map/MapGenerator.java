@@ -1,11 +1,8 @@
 package com.shadyaardvark.map;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class MapGenerator {
     private static final int GENERATING = -2;
@@ -36,7 +33,6 @@ public class MapGenerator {
         }
 
         // Generate Regions and teams
-        Random random = new Random();
         int region = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -47,7 +43,7 @@ public class MapGenerator {
                     hexagon.setTeam(region % numPlayers);
                     Array<Hexagon> adj = getAdjacent(hexagon, true);
                     for (Hexagon hex : adj) {
-                        if (random.nextFloat() <= .75f && hex.getRegion() == GENERATING) {
+                        if (MathUtils.random() <= .75f && hex.getRegion() == GENERATING) {
                             hex.setRegion(region);
                             hex.setTeam(region % numPlayers);
                         }
@@ -71,15 +67,14 @@ public class MapGenerator {
         }
 
         // No neighbors were free, get next free hexagon
-        Set<Hexagon> hexagons = new HashSet<>();
+        ObjectSet<Hexagon> hexagons = new ObjectSet<>();
         for (Hexagon hex : map.getHexagons()) {
             if (hex.isValid()) {
-                hexagons.addAll(Arrays.asList(getAdjacent(hex, false).toArray()));
+                hexagons.addAll(getAdjacent(hex, false));
             }
         }
 
-        return hexagons.iterator()
-                .next()
+        return hexagons.first()
                 .getPosition();
     }
 

@@ -1,22 +1,20 @@
 package com.shadyaardvark.map;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class OutlineRenderer {
     private static final int LINE_SIZE = 4;
     private ShapeRenderer shapeRenderer;
-    private Set<Line> outlines;
+    private ObjectSet<Line> outlines;
 
     public OutlineRenderer(HexagonMap map) {
         shapeRenderer = new ShapeRenderer();
-        outlines = new HashSet<>();
+        outlines = new ObjectSet<>();
 
         Array<Hexagon> padding = new Array<>();
         for (int x = -1; x <= map.getWidth(); x++) {

@@ -44,7 +44,7 @@ public class LocalGame implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width, height);
+//        camera.setToOrtho(false, width, height);
     }
 
     @Override
