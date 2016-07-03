@@ -1,78 +1,57 @@
 package com.shadyaardvark;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
-import com.shadyaardvark.map.HexData;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.shadyaardvark.map.Hexagon;
+import com.shadyaardvark.map.HexagonMap;
 import com.shadyaardvark.map.MapGenerator;
 import com.shadyaardvark.map.MapRenderer;
 import com.shadyaardvark.map.OutlineRenderer;
-import org.codetome.hexameter.core.api.Hexagon;
-import org.codetome.hexameter.core.api.HexagonalGrid;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class GameBoard {
-    private int width;
-    private int height;
-
     private MapRenderer mapRenderer;
     private OutlineRenderer outlines;
+    private IntMap<Region> regionMap;
 
-    private HexagonalGrid grid;
-    private Map<Integer, Region> regionMap;
+    private float hexWidth;
+    private float hexHeight;
 
-    public GameBoard(int width, int height, int numPlayers) {
-        this.width = width;
-        this.height = height;
-        regionMap = new HashMap<>();
-        createMap(numPlayers);
+    public GameBoard() {
+        regionMap = new IntMap<>();
     }
 
-    public void createMap(int numPlayers) {
-        MapGenerator generator = new MapGenerator(width, height, numPlayers);
-        generator.print();
+    public void createMap(int width, int height, int numPlayers) {
+        MapGenerator generator = new MapGenerator(width, height);
 
-        grid = generator.getGrid();
+        HexagonMap map = generator.generate(numPlayers);
+
         regionMap.clear();
 
-        // Add each hexagon to its region
-        grid.getHexagons().forEach(hexagon -> {
-            if (hexagon.getSatelliteData().isPresent()) {
-                HexData data = (HexData) hexagon.getSatelliteData().get();
-                regionMap.putIfAbsent(data.region, new Region());
-
-                Region region = regionMap.get(data.region);
-                region.region = data.region;
+        for (Hexagon hexagon : map.getHexagons()) {
+            if (hexagon.isValid()) {
+                Region region = new Region();
+                region.region = hexagon.getRegion();
                 region.regionHexagons.add(hexagon);
-            }
-        });
 
-        // Add all neighbors to a region
-        grid.getHexagons().forEach(hexagon -> {
-            if (hexagon.getSatelliteData().isPresent()) {
-                HexData data = (HexData) hexagon.getSatelliteData().get();
-                Region region = regionMap.get(data.region);
-
-                grid.getNeighborsOf(hexagon).forEach(neighbor -> {
-                    if (neighbor.getSatelliteData().isPresent()) {
-                        HexData neighborData = (HexData) neighbor.getSatelliteData().get();
-
-                        if (data.region != neighborData.region) {
-                            region.neighboringRegions.add(neighborData.region);
-                            region.neighboringHexagons.addAll(regionMap.get(neighborData.region).regionHexagons);
-                        }
+                Array<Hexagon> neighbors = map.getNeighborsOf(hexagon);
+                for (Hexagon neighbor : neighbors) {
+                    if (neighbor.isValid() && hexagon.getRegion() != neighbor.getRegion()) {
+                        region.neighboringRegions.add(neighbor.getRegion());
                     }
-                });
-            }
-        });
+                }
 
-        mapRenderer = new MapRenderer(grid);
-        outlines = new OutlineRenderer(grid);
+                regionMap.put(hexagon.getRegion(), region);
+            }
+        }
+
+        hexWidth = map.getHexagons().first().getWidth();
+        hexHeight = map.getHexagons().first().getHeight();
+
+        mapRenderer = new MapRenderer(map);
+        outlines = new OutlineRenderer(map);
     }
 
     public void render(OrthographicCamera camera) {
@@ -81,47 +60,23 @@ public class GameBoard {
         outlines.render(camera);
     }
 
-    public Hexagon getHexagonFromScreen(int x, int y, OrthographicCamera camera) {
-        Vector3 pos = camera.unproject(new Vector3(x, y, 0));
-        if (grid.getByPixelCoordinate(pos.x, pos.y).isPresent()) {
-            return grid.getByPixelCoordinate(pos.x, pos.y)
-                    .get();
-        } else {
-            return null;
-        }
-    }
-
-    public Array<Hexagon> getNeighborRegionHexagons(Hexagon hexagon) {
-        Array<Hexagon> neighbors = new Array<>();
-
-        if (hexagon.getSatelliteData().isPresent()) {
-            HexData data = (HexData) hexagon.getSatelliteData().get();
-            regionMap.get(data.region).neighboringHexagons.forEach(neighbors::add);
-        }
-
-        return neighbors;
-    }
-
-    public IntArray getNeighborRegions(Hexagon hexagon) {
-        IntArray neighbors = new IntArray();
-
-        if (hexagon.getSatelliteData().isPresent()) {
-            HexData data = (HexData) hexagon.getSatelliteData().get();
-            regionMap.get(data.region).neighboringRegions.forEach(neighbors::add);
-        }
-
-        return neighbors;
-    }
-
     public void dispose() {
         outlines.dispose();
         mapRenderer.dispose();
     }
 
+    public float getHexWidth() {
+        return hexWidth;
+    }
+
+    public float getHexHeight() {
+        return hexHeight;
+    }
+
     private class Region {
         int region;
-        Set<Integer> neighboringRegions = new HashSet<>();
-        Set<Hexagon> neighboringHexagons = new HashSet<>();
-        Set<Hexagon> regionHexagons = new HashSet<>();
+
+        IntSet neighboringRegions = new IntSet();
+        ObjectSet<Hexagon> regionHexagons = new ObjectSet<>();
     }
 }

@@ -3,11 +3,8 @@ package com.shadyaardvark.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import org.codetome.hexameter.core.api.HexagonalGrid;
-import org.codetome.hexameter.core.api.Point;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class MapRenderer {
     private static final short[] INDEX = {
@@ -21,40 +18,38 @@ public class MapRenderer {
     private static final Color[] COLORS = {Color.PURPLE, Color.CYAN, Color.CORAL, Color.PINK, Color.FOREST, Color.GOLD, Color.CHARTREUSE, Color.ORANGE};
 
     private ShapeRenderer shapeRenderer;
-    private HexagonalGrid grid;
+    private HexagonMap map;
 
-    public MapRenderer(HexagonalGrid grid) {
-        this.grid = grid;
+    public MapRenderer(HexagonMap map) {
+        this.map = map;
         shapeRenderer = new ShapeRenderer();
     }
 
     public void render(OrthographicCamera camera) {
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        grid.getHexagons().forEach(hexagon -> {
 
-            if (hexagon.getSatelliteData().isPresent()) {
-                HexData data = (HexData) hexagon.getSatelliteData().get();
-
-                if (data.highlight) {
+        for (Hexagon hexagon : map.getHexagons()) {
+            if (hexagon.isValid()) {
+                if (hexagon.isHighlight()) {
                     shapeRenderer.setColor(Color.RED);
                 } else {
-                    shapeRenderer.setColor(COLORS[data.team]);
+                    shapeRenderer.setColor(COLORS[hexagon.getTeam()]);
                 }
 
-                List<Point> points = new ArrayList<>();
-                points.add(Point.fromPosition(hexagon.getCenterX(), hexagon.getCenterY()));
-                points.addAll(hexagon.getPoints());
+                Array<Vector2> points = hexagon.getPoints();
 
                 // Draw each triangle in the hexagon
                 for (int i = 0; i < INDEX.length; i += 3) {
-                    shapeRenderer.triangle(
-                            (float) points.get(INDEX[i]).getCoordinateX(), (float) points.get(INDEX[i]).getCoordinateY(),
-                            (float) points.get(INDEX[i + 1]).getCoordinateX(), (float) points.get(INDEX[i + 1]).getCoordinateY(),
-                            (float) points.get(INDEX[i + 2]).getCoordinateX(), (float) points.get(INDEX[i + 2]).getCoordinateY());
+                    shapeRenderer.triangle(points.get(INDEX[i]).x,
+                            points.get(INDEX[i]).y,
+                            points.get(INDEX[i + 1]).x,
+                            points.get(INDEX[i + 1]).y,
+                            points.get(INDEX[i + 2]).x,
+                            points.get(INDEX[i + 2]).y);
                 }
             }
-        });
+        }
         shapeRenderer.end();
     }
 

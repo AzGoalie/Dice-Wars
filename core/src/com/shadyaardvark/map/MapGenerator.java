@@ -1,120 +1,113 @@
 package com.shadyaardvark.map;
 
-import org.codetome.hexameter.core.api.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.shadyaardvark.map.Util.convertToAxial;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class MapGenerator {
+    private static final int GENERATING = -2;
     private static final float PERCENT_FILLED = 0.75f;
     private static final int RADIUS = 32;
-    private HexagonalGrid grid;
 
-    public MapGenerator(int width, int height, int numPlayers) {
-        grid = new HexagonalGridBuilder()
-                .setOrientation(HexagonOrientation.POINTY_TOP)
-                .setGridLayout(HexagonalGridLayout.RECTANGULAR)
-                .setGridWidth(width)
-                .setGridHeight(height)
-                .setRadius(RADIUS)
-                .build();
+    private int width;
+    private int height;
+    private HexagonMap map;
 
-        generate(numPlayers);
+    public MapGenerator(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
-    public void generate(int numPlayers) {
-        int width = grid.getGridData().getGridWidth();
-        int height = grid.getGridData().getGridHeight();
+    public HexagonMap generate(int numPlayers) {
+        map = new HexagonMap(width, height, RADIUS);
 
         // Generate Map
         int numFilled = 0;
-        AxialCoordinate currentPos = convertToAxial(width / 2, height / 2);
+        AxialCoordinate currentPos = AxialCoordinate.offsetToAxial(width / 2, height / 2);
         while (numFilled <= width * height * PERCENT_FILLED) {
-            grid.getByAxialCoordinate(currentPos).get().setSatelliteData(new HexData());
+            Hexagon hexagon = map.getHexagon(currentPos);
+            hexagon.setTeam(GENERATING);
+            hexagon.setRegion(GENERATING);
             numFilled++;
-            currentPos = getNextFree(grid.getByAxialCoordinate(currentPos).get());
+            currentPos = getNextFree(hexagon);
         }
 
         // Generate Regions and teams
-        Random random = new Random();
         int region = 0;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Hexagon hexagon = grid.getByAxialCoordinate(convertToAxial(x, y)).get();
-                if (hexagon.getSatelliteData().isPresent()
-                        && ((HexData) hexagon.getSatelliteData().get()).region == HexData.INVALID) {
-                    HexData data = (HexData) hexagon.getSatelliteData().get();
-                    data.region = region;
-                    data.team = region % numPlayers;
-                    List<Hexagon> adj = getAdjacent(hexagon, true);
+                AxialCoordinate coordinate = AxialCoordinate.offsetToAxial(x, y);
+                Hexagon hexagon = map.getHexagon(coordinate);
+                if (hexagon.isValid() && hexagon.getRegion() == GENERATING) {
+                    hexagon.setRegion(region);
+                    hexagon.setTeam(region % numPlayers);
+                    Array<Hexagon> adj = getAdjacent(hexagon, true);
                     for (Hexagon hex : adj) {
-                        HexData adjData = (HexData) hex.getSatelliteData().get();
-                        if (random.nextFloat() <= .75f
-                                && adjData.region == HexData.INVALID) {
-                            adjData.region = region;
-                            adjData.team = region % numPlayers;
+                        if (MathUtils.random() <= .75f && hex.getRegion() == GENERATING) {
+                            hex.setRegion(region);
+                            hex.setTeam(region % numPlayers);
                         }
                     }
                     region++;
                 }
             }
         }
+        return map;
     }
 
     private AxialCoordinate getNextFree(Hexagon hexagon) {
-        List<Hexagon> neighbors = new ArrayList<>(grid.getNeighborsOf(hexagon));
-        Collections.shuffle(neighbors);
+        Array<Hexagon> neighbors = map.getNeighborsOf(hexagon);
+        neighbors.shuffle();
 
         // Check all neighbors for free hexagon
         for (Hexagon hex : neighbors) {
-            if (!hex.getSatelliteData().isPresent()) {
-                return hex.getAxialCoordinate();
+            if (!hex.isValid()) {
+                return hex.getPosition();
             }
         }
 
         // No neighbors were free, get next free hexagon
-        Set<Hexagon> hexagons = new HashSet<>();
-        grid.getHexagons().forEach(hex -> {
-            if (!getAdjacent(hex, false).isEmpty()) {
+        ObjectSet<Hexagon> hexagons = new ObjectSet<>();
+        for (Hexagon hex : map.getHexagons()) {
+            if (hex.isValid()) {
                 hexagons.addAll(getAdjacent(hex, false));
             }
-        });
+        }
 
-        return hexagons.iterator().next().getAxialCoordinate();
+        return hexagons.first()
+                .getPosition();
     }
 
-    private List<Hexagon> getAdjacent(Hexagon hexagon, boolean filled) {
-        List<Hexagon> hexagons = new ArrayList<>(grid.getNeighborsOf(hexagon));
-        List<Hexagon> result = hexagons.stream().filter(hex ->
-                (hex.getSatelliteData().isPresent() == filled))
-                .collect(Collectors.toList());
+    private Array<Hexagon> getAdjacent(Hexagon hexagon, boolean filled) {
+        Array<Hexagon> hexagons = map.getNeighborsOf(hexagon);
+        Array<Hexagon> result = new Array<>();
 
-        Collections.shuffle(result);
+        for (Hexagon hex : hexagons) {
+            if (hex.isValid() == filled) {
+                result.add(hex);
+            }
+        }
+
+        result.shuffle();
         return result;
     }
 
     public void print() {
-        int width = grid.getGridData().getGridWidth();
-        int height = grid.getGridData().getGridHeight();
+        int width = map.getWidth();
+        int height = map.getHeight();
 
         for (int y = height - 1; y >= 0; y--) {
             for (int x = 0; x < width; x++) {
-                Hexagon hexagon = grid.getByAxialCoordinate(convertToAxial(x, y)).get();
+                AxialCoordinate coordinate = AxialCoordinate.offsetToAxial(x, y);
+                Hexagon hexagon = map.getHexagon(coordinate);
 
-                if (hexagon.getSatelliteData().isPresent()) {
-                    HexData data = (HexData) hexagon.getSatelliteData().get();
-                    System.out.print(data.region + " ");
+                if (hexagon.isValid()) {
+                    System.out.print(hexagon.getRegion() + " ");
                 } else {
                     System.out.print(". ");
                 }
             }
             System.out.println();
         }
-    }
-
-    public HexagonalGrid getGrid() {
-        return grid;
     }
 }

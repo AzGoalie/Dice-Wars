@@ -6,4 +6,7 @@ public class Settings {
     public static final boolean MSAA = true;
     public static final int SAMPLES = 4;
     public static final int FPS = 30;
+
+    public static final int MAP_WIDTH = 10;
+    public static final int MAP_HEIGHT = 10;
 }
