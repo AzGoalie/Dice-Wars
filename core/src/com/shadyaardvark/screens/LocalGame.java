@@ -5,25 +5,28 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.shadyaardvark.GameBoard;
-import com.shadyaardvark.Settings;
+import com.shadyaardvark.map.GameBoard;
+import com.shadyaardvark.map.GameBoardRenderer;
 
 public class LocalGame implements Screen {
     private Game game;
     private OrthographicCamera camera;
-    private GameBoard map;
+    private GameBoard board;
+    private GameBoardRenderer boardRenderer;
 
     public LocalGame(Game game) {
         this.game = game;
 
-        map = new GameBoard();
         //TODO: make number of players configurable
-        map.createMap(Settings.MAP_WIDTH, Settings.MAP_HEIGHT, 5);
+        board = new GameBoard(5);
+
+        boardRenderer = new GameBoardRenderer(board.getRegionMap());
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,
-                map.getHexWidth() * (Settings.MAP_WIDTH + 1),
-                map.getHexHeight() * (Settings.MAP_HEIGHT + 1));
+                //HEX_WIDTH * (Settings.MAP_WIDTH + 1),
+                //HEX_HEIGHT * (Settings.MAP_HEIGHT + 1));
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
@@ -37,11 +40,12 @@ public class LocalGame implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         if (Gdx.input.justTouched()) {
-            map.createMap(Settings.MAP_WIDTH, Settings.MAP_HEIGHT, 5);
+            board = new GameBoard(5);
+            boardRenderer = new GameBoardRenderer(board.getRegionMap());
         }
 
         camera.update();
-        map.render(camera);
+        boardRenderer.render(camera);
     }
 
     @Override
@@ -65,6 +69,5 @@ public class LocalGame implements Screen {
 
     @Override
     public void dispose() {
-        map.dispose();
     }
 }
