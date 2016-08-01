@@ -80,6 +80,6 @@ public class Hexagon {
 
     @Override
     public String toString() {
-        return String.format("hexagon(%d, %d, %d)", q, r, s);
+        return "hexagon( " + q + ", " + r + ", " + s + ")";
     }
 }
