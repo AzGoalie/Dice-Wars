@@ -75,5 +75,6 @@ public class LocalGame implements Screen {
 
     @Override
     public void dispose() {
+        boardRenderer.dispose();
     }
 }

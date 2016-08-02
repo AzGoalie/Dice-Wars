@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
 
 public class Region {
     private final int region;
@@ -13,7 +12,7 @@ public class Region {
     private int team;
     private boolean highlight;
     private Set<Integer> neighboringRegions = new HashSet<>();
-    private FloatArray points = new FloatArray();
+    private Array<Vector2> points = new Array<>();
 
     public Region(int region) {
         this.region = region;
@@ -35,7 +34,7 @@ public class Region {
         return neighboringRegions;
     }
 
-    public FloatArray getPoints() {
+    public Array<Vector2> getPoints() {
         return points;
     }
 
@@ -48,10 +47,7 @@ public class Region {
     }
 
     public void addPoints(Array<Vector2> newPoints) {
-        for (Vector2 point : newPoints) {
-            points.add(point.x);
-            points.add(point.y);
-        }
+        points.addAll(newPoints);
     }
 
     public void addNeighborRegion(int neighbor) {
