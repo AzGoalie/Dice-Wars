@@ -3,27 +3,30 @@ package com.shadyaardvark.map;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.shadyaardvark.hex.Hexagon;
 
 public class Region {
-    private final int region;
-
+    private int region;
     private int team;
     private boolean highlight;
     private Set<Integer> neighboringRegions = new HashSet<>();
-    private Array<Vector2> points = new Array<>();
-
-    public Region(int region) {
-        this.region = region;
-    }
+    private Array<Hexagon> hexagons = new Array<>();
 
     public int getRegion() {
         return region;
     }
 
+    public void setRegion(int region) {
+        this.region = region;
+    }
+
     public int getTeam() {
         return team;
+    }
+
+    public void setTeam(int team) {
+        this.team = team;
     }
 
     public boolean isHighlight() {
@@ -34,20 +37,16 @@ public class Region {
         return neighboringRegions;
     }
 
-    public Array<Vector2> getPoints() {
-        return points;
+    public Array<Hexagon> getHexagons() {
+        return hexagons;
     }
 
     public void setHighlight(boolean highlight) {
         this.highlight = highlight;
     }
 
-    public void setTeam(int team) {
-        this.team = team;
-    }
-
-    public void addPoints(Array<Vector2> newPoints) {
-        points.addAll(newPoints);
+    public void addHexagon(Hexagon hexagon) {
+        hexagons.add(hexagon);
     }
 
     public void addNeighborRegion(int neighbor) {

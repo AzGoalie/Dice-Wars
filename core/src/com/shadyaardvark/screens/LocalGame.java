@@ -24,7 +24,7 @@ public class LocalGame implements Screen {
         //TODO: make number of players configurable
         board = new GameBoard(5);
 
-        boardRenderer = new GameBoardRenderer(board.getRegionMap());
+        boardRenderer = new GameBoardRenderer(board);
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,
@@ -44,7 +44,7 @@ public class LocalGame implements Screen {
 
         if (Gdx.input.justTouched()) {
             board = new GameBoard(5);
-            boardRenderer = new GameBoardRenderer(board.getRegionMap());
+            boardRenderer = new GameBoardRenderer(board);
         }
 
         camera.update();
