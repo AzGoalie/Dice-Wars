@@ -1,20 +1,17 @@
 package com.shadyaardvark.map;
 
+import static com.shadyaardvark.Settings.LINE_WIDTH;
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.PolygonRegion;
-import com.badlogic.gdx.graphics.g2d.PolygonSprite;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.ShortArray;
+import com.badlogic.gdx.utils.Array;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
 
@@ -23,112 +20,88 @@ public class GameBoardRenderer {
             {Color.PURPLE, Color.CYAN, Color.ROYAL, Color.PINK, Color.FOREST, Color.MAROON,
                     Color.LIME, Color.CORAL};
 
-    private PolygonSpriteBatch batch;
-    private Map<Integer, PolygonSprite> regionSprites;
+    private static final short[] INDEX = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 1};
+
+    private ShapeRenderer hexRenderer;
     private GameBoard gameBoard;
+    private Map<Integer, Array<Vector2>> outlines;
 
     public GameBoardRenderer(GameBoard board) {
         this.gameBoard = board;
-        batch = new PolygonSpriteBatch();
-        regionSprites = createRegions(board.getHexagonMap(), board.getRegionMap());
+        hexRenderer = new ShapeRenderer();
+        outlines = new HashMap<>();
+
+        for (Region region : gameBoard.getRegionMap().values()) {
+            outlines.put(region.getRegion(),
+                    createOutline(gameBoard.getHexagonMap(), region.getHexagons()));
+        }
     }
 
     public void render(OrthographicCamera camera) {
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
+        hexRenderer.setProjectionMatrix(camera.combined);
+        hexRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         for (Region region : gameBoard.getRegionMap().values()) {
-            if (region.isValid()) {
-                PolygonSprite sprite = regionSprites.get(region.getRegion());
-                if (region.isHighlight()) {
-                    sprite.setColor(Color.RED);
-                } else {
-                    sprite.setColor(COLORS[region.getTeam()]);
+            if (region.isHighlight()) {
+                hexRenderer.setColor(Color.RED);
+            } else {
+                hexRenderer.setColor(COLORS[region.getTeam()]);
+            }
+
+            for (Hexagon hexagon : region.getHexagons()) {
+                Array<Vector2> points = new Array<>();
+                points.add(gameBoard.getHexagonMap().getHexCenter(hexagon));
+                points.addAll(gameBoard.getHexagonMap().getHexCorners(hexagon));
+
+                // Draw each triangle in the hexagon
+                for (int i = 0; i < INDEX.length; i += 3) {
+                    hexRenderer.triangle(points.get(INDEX[i]).x,
+                            points.get(INDEX[i]).y,
+                            points.get(INDEX[i + 1]).x,
+                            points.get(INDEX[i + 1]).y,
+                            points.get(INDEX[i + 2]).x,
+                            points.get(INDEX[i + 2]).y);
                 }
-                regionSprites.get(region.getRegion())
-                        .draw(batch);
+            }
+
+            // Draw outline
+            hexRenderer.setColor(Color.BLACK);
+            for (int i = 0; i < outlines.get(region.getRegion()).size; i += 2) {
+                Vector2 a = outlines.get(region.getRegion()).get(i);
+                Vector2 b = outlines.get(region.getRegion()).get(i + 1);
+                hexRenderer.rectLine(a.x, a.y, b.x, b.y, LINE_WIDTH);
             }
         }
-        batch.end();
-
-//        for (Array<Vector2> outline : outlines) {
-//            gl20.begin(camera.combined, GL20.GL_TRIANGLE_STRIP);
-//            for (Vector2 point : outline) {
-//                gl20.color(Color.BLACK);
-//                gl20.vertex(point.x, point.y, 0);
-//            }
-//            gl20.end();
-//        }
+        hexRenderer.end();
     }
 
     public void dispose() {
-        batch.dispose();
+        hexRenderer.dispose();
     }
 
-    private Map<Integer, PolygonSprite> createRegions(HexagonMap hexagonMap, Map<Integer, Region> regionMap) {
-        Map<Integer, PolygonSprite> result = new HashMap<>();
+    private Array<Vector2> createOutline(HexagonMap map, Array<Hexagon> hexagons) {
+        Array<Vector2> result = new Array<>();
 
-        Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(Color.WHITE);
-        pix.fill();
-        TextureRegion textureRegion = new TextureRegion(new Texture(pix));
+        for (Hexagon hexagon : hexagons) {
+            Array<Hexagon> neighbors = hexagon.getNeighbors();
 
-        EarClippingTriangulator triangulator = new EarClippingTriangulator();
-        for (Region region : regionMap.values()) {
-            FloatArray verts = new FloatArray();
-            for (Hexagon h : region.getHexagons()) {
-                for (Vector2 p : hexagonMap.getHexCorners(h)) {
-                    verts.addAll(p.x, p.y);
+            for (Hexagon neighbor : neighbors) {
+                if (!hexagons.contains(neighbor, false)) {
+                    Set<Vector2> set = new HashSet<>();
+
+                    for (Vector2 v1 : map.getHexCorners(hexagon)) {
+                        for (Vector2 v2 : map.getHexCorners(neighbor)) {
+                            if (v1.epsilonEquals(v2, 0.1f)) {
+                                set.add(v1);
+                            }
+                        }
+                    }
+
+                    result.addAll(set.toArray(new Vector2[] {}));
                 }
             }
-
-            ShortArray triangles = triangulator.computeTriangles(verts);
-            PolygonRegion polyReg = new PolygonRegion(textureRegion,
-                    verts.toArray(),
-                    triangles.toArray());
-            result.put(region.getRegion(), new PolygonSprite(polyReg));
         }
 
         return result;
     }
-
-//    private Array<Array<Vector2>> createOutlines(Map<Integer, Region> regionMap) {
-//        Array<Array<Vector2>> result = new Array<>();
-//
-//        for (Region region : regionMap.values()) {
-//            Array<Vector2> outline = new Array<>();
-//
-//            outline.add(region.getPoints().get(0));
-//            for (int i=0; i<region.getPoints().size-1; i++) {
-//                Vector2 a = region.getPoints().get(i);
-//                Vector2 b = region.getPoints().get(i+1);
-//
-//               outline.addAll(perp(a, b));
-//            }
-//
-//            outline.add(region.getPoints().get(region.getPoints().size-1));
-//            result.add(outline);
-//        }
-//
-//        return result;
-//    }
-//
-//    private Array<Vector2> perp(Vector2 a, Vector2 b) {
-//        Array<Vector2> result = new Array<>();
-//        Vector2 perp = new Vector2();
-//
-//        Vector2 p = a;
-//        Vector2 p2 = b;
-//
-//        perp.set(p).sub(p2).nor();
-//
-//        perp.set(-perp.y, perp.x);
-//
-//        perp.scl(LINE_WIDTH/2f);
-//
-//        result.add(new Vector2(p));
-//        result.add(new Vector2(p.x-perp.x, p.y-perp.y));
-//
-//        return result;
-//    }
 }
