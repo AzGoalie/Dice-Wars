@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class HexagonMap {
     private final Map<Vector2, Hexagon> hexagons;
@@ -16,11 +17,17 @@ public class HexagonMap {
     private final Vector2 origin;
     private final Vector2 hexSize;
 
+    private final Array<Hexagon> hexagonArray;
+    private final ObjectMap<Hexagon, HexInfo> hexInfo;
+
     private HexagonMap() {
         hexagons = null;
         orientation = null;
         origin = null;
         hexSize = null;
+
+        hexagonArray = null;
+        hexInfo = null;
     }
 
     HexagonMap(Map<Vector2, Hexagon> hexagons, Orientation orientation, Vector2 origin,
@@ -29,6 +36,13 @@ public class HexagonMap {
         this.orientation = orientation;
         this.origin = origin;
         this.hexSize = hexSize;
+
+        hexagonArray = new Array<>(hexagons.values().toArray(new Hexagon[] {}));
+
+        hexInfo = new ObjectMap<>(hexagons.size());
+        for (Hexagon hexagon : hexagons.values()) {
+            hexInfo.put(hexagon, generateHexInfo(hexagon));
+        }
     }
 
     public Hexagon getHexagon(Vector2 axialPosition) {
@@ -36,19 +50,15 @@ public class HexagonMap {
     }
 
     public Array<Hexagon> getHexagons() {
-        Array<Hexagon> result = new Array<>();
-
-        for (Hexagon hexagon : hexagons.values()) {
-            result.add(hexagon);
-        }
-
-        return result;
+        return hexagonArray;
     }
 
     public Vector2 getHexCenter(Hexagon h) {
-        double x = (orientation.f0 * h.q + orientation.f1 * h.r) * hexSize.x;
-        double y = (orientation.f2 * h.q + orientation.f3 * h.r) * hexSize.y;
-        return new Vector2((float) x + origin.x, (float) y + origin.y);
+        if (!hexInfo.containsKey(h)) {
+            hexInfo.put(h, generateHexInfo(h));
+        }
+
+        return hexInfo.get(h).center;
     }
 
     public Hexagon pixelToHexagon(Vector2 p) {
@@ -72,9 +82,16 @@ public class HexagonMap {
     }
 
     public Array<Vector2> getHexCorners(Hexagon h) {
-        Array<Vector2> corners = new Array<>();
+        if (!hexInfo.containsKey(h)) {
+            hexInfo.put(h, generateHexInfo(h));
+        }
 
-        Vector2 center = getHexCenter(h);
+        return hexInfo.get(h).corners;
+    }
+
+    private Array<Vector2> generateCorners(Hexagon h) {
+        Array<Vector2> corners = new Array<>();
+        Vector2 center = generateCenter(h);
         for (int i = 0; i < 6; i++) {
             double angle = 2.0 * Math.PI * (orientation.startAngle - i) / 6;
 
@@ -82,7 +99,25 @@ public class HexagonMap {
                     center.y + hexSize.y * (float) sin(angle));
             corners.add(Vector2);
         }
-
         return corners;
+    }
+
+    private Vector2 generateCenter(Hexagon h) {
+        double x = (orientation.f0 * h.q + orientation.f1 * h.r) * hexSize.x;
+        double y = (orientation.f2 * h.q + orientation.f3 * h.r) * hexSize.y;
+        return new Vector2((float) x + origin.x, (float) y + origin.y);
+    }
+
+    private HexInfo generateHexInfo(Hexagon h) {
+        HexInfo info = new HexInfo();
+        info.center = generateCenter(h);
+        info.corners = generateCorners(h);
+
+        return info;
+    }
+
+    private class HexInfo {
+        public Vector2 center;
+        public Array<Vector2> corners;
     }
 }

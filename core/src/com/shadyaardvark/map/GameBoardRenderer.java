@@ -2,9 +2,7 @@ package com.shadyaardvark.map;
 
 import static com.shadyaardvark.Settings.LINE_WIDTH;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
 
@@ -24,12 +23,14 @@ public class GameBoardRenderer {
 
     private ShapeRenderer hexRenderer;
     private GameBoard gameBoard;
-    private Map<Integer, Array<Vector2>> outlines;
+    private IntMap<Array<Vector2>> outlines;
+    private Array<Vector2> points;
 
     public GameBoardRenderer(GameBoard board) {
         this.gameBoard = board;
         hexRenderer = new ShapeRenderer();
-        outlines = new HashMap<>();
+        outlines = new IntMap<>();
+        points = new Array<>();
 
         for (Region region : gameBoard.getRegionMap().values()) {
             outlines.put(region.getRegion(),
@@ -49,7 +50,7 @@ public class GameBoardRenderer {
             }
 
             for (Hexagon hexagon : region.getHexagons()) {
-                Array<Vector2> points = new Array<>();
+                points.clear();
                 points.add(gameBoard.getHexagonMap().getHexCenter(hexagon));
                 points.addAll(gameBoard.getHexagonMap().getHexCorners(hexagon));
 

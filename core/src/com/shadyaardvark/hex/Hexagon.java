@@ -3,6 +3,7 @@ package com.shadyaardvark.hex;
 import java.util.Arrays;
 import java.util.List;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class Hexagon {
@@ -16,11 +17,14 @@ public class Hexagon {
     public final int q;
     public final int r;
     public final int s;
+    private final Vector2 axialPos;
 
     public Hexagon(int q, int r, int s) {
         this.q = q;
         this.r = r;
         this.s = s;
+
+        axialPos = new Vector2(q, r);
 
         if (q + r + s != 0) {
             throw new IllegalArgumentException("Hexagon positon must equal q + r + s = 0");
@@ -53,10 +57,14 @@ public class Hexagon {
 
     public Array<Hexagon> getNeighbors() {
         Array<Hexagon> neighbors = new Array<>();
-        for (Hexagon hex : directions) {
-            neighbors.add(add(hex));
-        }
+            for (Hexagon hex : directions) {
+                neighbors.add(add(hex));
+            }
         return neighbors;
+    }
+
+    public Vector2 getAxialPos() {
+        return axialPos;
     }
 
     @Override

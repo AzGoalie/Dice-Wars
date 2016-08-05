@@ -6,11 +6,9 @@ import static com.shadyaardvark.Settings.MAP_HEIGHT;
 import static com.shadyaardvark.Settings.MAP_WIDTH;
 import static com.shadyaardvark.hex.Orientation.POINTY_TOP;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.shadyaardvark.hex.ConversionUtils;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
@@ -19,14 +17,12 @@ import com.shadyaardvark.hex.layouts.RectangleLayout;
 
 public class GameBoard {
     private static final float PERCENT_FILLED = 0.75f;
-    private Map<Integer, Region> regionMap;
-
+    private IntMap<Region> regionMap = new IntMap<>();
+    private Array<Hexagon> available = new Array<>();
+    private Array<Hexagon> valid = new Array<>();
     private HexagonMap hexagonMap;
-    private Array<Hexagon> available;
 
     public GameBoard(int numPlayers) {
-        regionMap = new HashMap<>();
-        available = new Array<>();
         createMap(numPlayers);
     }
 
@@ -52,7 +48,7 @@ public class GameBoard {
 
         int regionId = 0;
         Array<Hexagon> tmp = new Array<>(available);
-        available.shuffle();
+        tmp.shuffle();
         for (Hexagon hexagon : tmp) {
             if (!available.contains(hexagon, false)) {
                 continue;
@@ -76,32 +72,34 @@ public class GameBoard {
     }
 
     private Vector2 getNextFree(Hexagon hexagon) {
-        Array<Hexagon> neighbors = hexagon.getNeighbors();
-        neighbors.shuffle();
+        valid.clear();
 
         // Check all neighbors for free hexagon
-        for (Hexagon hex : neighbors) {
+        for (Hexagon hex : hexagon.getNeighbors()) {
             if (hexagonMap.getHexagons().contains(hex, false)
                     && !available.contains(hex, false)) {
-                return new Vector2(hex.q, hex.r);
+                valid.add(hex);
             }
+        }
+
+        if (valid.size > 0) {
+            return valid.random().getAxialPos();
         }
 
         // No neighbors were free, get next free hexagon
-        neighbors.clear();
+        valid.clear();
         for (Hexagon hex : available) {
             for (Hexagon n : hex.getNeighbors()) {
                 if (hexagonMap.getHexagons().contains(n, false)) {
-                    neighbors.add(n);
+                    valid.add(n);
                 }
             }
         }
-        neighbors.shuffle();
 
-        return new Vector2(neighbors.first().q, neighbors.first().r);
+        return valid.random().getAxialPos();
     }
 
-    Map<Integer, Region> getRegionMap() {
+    IntMap<Region> getRegionMap() {
         return regionMap;
     }
 
