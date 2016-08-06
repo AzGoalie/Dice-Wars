@@ -54,8 +54,8 @@ public class HexagonMap {
         return hexInfo.get(h).center;
     }
 
-    public Hexagon pixelToHexagon(Vector2 p) {
-        Vector2 pt = new Vector2((p.x - origin.x) / hexSize.x, (p.y - origin.y) / hexSize.y);
+    public Hexagon pixelToHexagon(float x, float y) {
+        Vector2 pt = new Vector2((x - origin.x) / hexSize.x, (y - origin.y) / hexSize.y);
         double q = orientation.b0 * pt.x + orientation.b1 * pt.y;
         double r = orientation.b2 * pt.x + orientation.b3 * pt.y;
         double s = -q - r;
