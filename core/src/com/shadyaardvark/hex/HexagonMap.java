@@ -20,16 +20,6 @@ public class HexagonMap {
     private final Array<Hexagon> hexagonArray;
     private final ObjectMap<Hexagon, HexInfo> hexInfo;
 
-    private HexagonMap() {
-        hexagons = null;
-        orientation = null;
-        origin = null;
-        hexSize = null;
-
-        hexagonArray = null;
-        hexInfo = null;
-    }
-
     HexagonMap(Map<Vector2, Hexagon> hexagons, Orientation orientation, Vector2 origin,
             Vector2 hexSize) {
         this.hexagons = hexagons;
@@ -37,9 +27,12 @@ public class HexagonMap {
         this.origin = origin;
         this.hexSize = hexSize;
 
-        hexagonArray = new Array<>(hexagons.values().toArray(new Hexagon[] {}));
+        hexagonArray = new Array<>();
+        for (Hexagon hexagon : hexagons.values()) {
+            hexagonArray.add(hexagon);
+        }
 
-        hexInfo = new ObjectMap<>(hexagons.size());
+        hexInfo = new ObjectMap<>();
         for (Hexagon hexagon : hexagons.values()) {
             hexInfo.put(hexagon, generateHexInfo(hexagon));
         }

@@ -7,18 +7,20 @@ import com.badlogic.gdx.utils.Array;
 import com.shadyaardvark.hex.Hexagon;
 
 public class Region {
-    private int region;
+    private final int id;
     private int team;
     private boolean highlight;
-    private Set<Integer> neighboringRegions = new HashSet<>();
-    private Array<Hexagon> hexagons = new Array<>();
+    private Set<Integer> neighboringRegions;
+    private Array<Hexagon> hexagons;
 
-    public int getRegion() {
-        return region;
+    public Region(int id) {
+        this.id = id;
+        neighboringRegions = new HashSet<>();
+        hexagons = new Array<>();
     }
 
-    public void setRegion(int region) {
-        this.region = region;
+    public int getId() {
+        return id;
     }
 
     public int getTeam() {
@@ -54,6 +56,6 @@ public class Region {
     }
 
     public boolean isValid() {
-        return region != 0;
+        return id != 0;
     }
 }

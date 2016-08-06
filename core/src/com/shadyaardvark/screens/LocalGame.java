@@ -3,23 +3,23 @@ package com.shadyaardvark.screens;
 import static com.shadyaardvark.Settings.HEX_HEIGHT;
 import static com.shadyaardvark.Settings.HEX_WIDTH;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.shadyaardvark.DiceWars;
 import com.shadyaardvark.Settings;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.GameBoardRenderer;
 
 public class LocalGame implements Screen {
-    private Game game;
+    private DiceWars game;
     private OrthographicCamera camera;
     private GameBoard board;
     private GameBoardRenderer boardRenderer;
 
-    public LocalGame(Game game) {
-        this.game = game;
+    public LocalGame(DiceWars diceWars) {
+        this.game = diceWars;
 
         //TODO: make number of players configurable
         board = new GameBoard(5);

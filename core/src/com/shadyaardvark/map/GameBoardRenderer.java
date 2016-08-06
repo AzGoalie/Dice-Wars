@@ -16,8 +16,7 @@ import com.shadyaardvark.hex.HexagonMap;
 
 public class GameBoardRenderer {
     private static final Color[] COLORS =
-            {Color.PURPLE, Color.CYAN, Color.ROYAL, Color.PINK, Color.FOREST, Color.MAROON,
-                    Color.LIME, Color.CORAL};
+            {Color.valueOf("AA2FFF"), Color.valueOf("01B0F0"), Color.valueOf("97FF7F"), Color.valueOf("E8A241"), Color.valueOf("FF5757")};
 
     private static final short[] INDEX = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 1};
 
@@ -33,7 +32,7 @@ public class GameBoardRenderer {
         points = new Array<>();
 
         for (Region region : gameBoard.getRegionMap().values()) {
-            outlines.put(region.getRegion(),
+            outlines.put(region.getId(),
                     createOutline(gameBoard.getHexagonMap(), region.getHexagons()));
         }
     }
@@ -67,9 +66,9 @@ public class GameBoardRenderer {
 
             // Draw outline
             hexRenderer.setColor(Color.BLACK);
-            for (int i = 0; i < outlines.get(region.getRegion()).size; i += 2) {
-                Vector2 a = outlines.get(region.getRegion()).get(i);
-                Vector2 b = outlines.get(region.getRegion()).get(i + 1);
+            for (int i = 0; i < outlines.get(region.getId()).size; i += 2) {
+                Vector2 a = outlines.get(region.getId()).get(i);
+                Vector2 b = outlines.get(region.getId()).get(i + 1);
                 hexRenderer.rectLine(a.x, a.y, b.x, b.y, LINE_WIDTH);
             }
         }
@@ -98,7 +97,9 @@ public class GameBoardRenderer {
                         }
                     }
 
-                    result.addAll(set.toArray(new Vector2[] {}));
+                    for (Vector2 v : set) {
+                        result.add(v);
+                    }
                 }
             }
         }

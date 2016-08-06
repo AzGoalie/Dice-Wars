@@ -1,13 +1,13 @@
 package com.shadyaardvark.screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
+import com.shadyaardvark.DiceWars;
 
 public class MainMenu implements Screen {
-    private Game game;
+    private DiceWars game;
 
-    public MainMenu(Game game) {
-        this.game = game;
+    public MainMenu(DiceWars diceWars) {
+        this.game = diceWars;
     }
 
     @Override
