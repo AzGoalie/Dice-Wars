@@ -1,8 +1,5 @@
 package com.shadyaardvark.screens;
 
-import static com.shadyaardvark.Settings.HEX_HEIGHT;
-import static com.shadyaardvark.Settings.HEX_WIDTH;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,6 +10,9 @@ import com.shadyaardvark.Settings;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.GameBoardRenderer;
 import com.shadyaardvark.map.Region;
+
+import static com.shadyaardvark.Settings.HEX_HEIGHT;
+import static com.shadyaardvark.Settings.HEX_WIDTH;
 
 public class LocalGame implements Screen {
     private DiceWars game;

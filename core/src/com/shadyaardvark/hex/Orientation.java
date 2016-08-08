@@ -28,8 +28,8 @@ public enum Orientation {
     public double startAngle;
 
     Orientation(double f0, double f1, double f2, double f3,
-            double b0, double b1, double b2, double b3,
-            double startAngle) {
+                double b0, double b1, double b2, double b3,
+                double startAngle) {
         this.f0 = f0;
         this.f1 = f1;
         this.f2 = f2;

@@ -1,10 +1,10 @@
 package com.shadyaardvark.hex;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Hexagon {
     private static List<Hexagon> directions = Arrays.asList(new Hexagon(1, 0, -1),
@@ -57,9 +57,9 @@ public class Hexagon {
 
     public Array<Hexagon> getNeighbors() {
         Array<Hexagon> neighbors = new Array<>();
-            for (Hexagon hex : directions) {
-                neighbors.add(add(hex));
-            }
+        for (Hexagon hex : directions) {
+            neighbors.add(add(hex));
+        }
         return neighbors;
     }
 

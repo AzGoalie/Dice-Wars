@@ -1,13 +1,13 @@
 package com.shadyaardvark.hex.layouts;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
-import java.util.HashMap;
-
 import com.badlogic.gdx.math.Vector2;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.Layout;
+
+import java.util.HashMap;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class HexagonLayout implements Layout {
     @Override

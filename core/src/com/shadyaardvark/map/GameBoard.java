@@ -1,11 +1,5 @@
 package com.shadyaardvark.map;
 
-import static com.shadyaardvark.Settings.HEX_HEIGHT;
-import static com.shadyaardvark.Settings.HEX_WIDTH;
-import static com.shadyaardvark.Settings.MAP_HEIGHT;
-import static com.shadyaardvark.Settings.MAP_WIDTH;
-import static com.shadyaardvark.hex.Orientation.POINTY_TOP;
-
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -16,6 +10,9 @@ import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
 import com.shadyaardvark.hex.HexagonMapBuilder;
 import com.shadyaardvark.hex.layouts.RectangleLayout;
+
+import static com.shadyaardvark.Settings.*;
+import static com.shadyaardvark.hex.Orientation.POINTY_TOP;
 
 public class GameBoard {
     private static final float PERCENT_FILLED = 0.75f;
@@ -47,6 +44,36 @@ public class GameBoard {
         } else {
             return null;
         }
+    }
+
+    public int calcLongestChain(int team) {
+        int max = 0;
+
+        for (Region region : regionMap.values()) {
+            if (region.getTeam() == team) {
+                Array<Region> checked = new Array<>();
+                checked.add(region);
+
+                int depth = regionDepth(region, checked);
+                if (depth > max) {
+                    max = depth;
+                }
+            }
+        }
+
+        return max;
+    }
+
+    private int regionDepth(Region region, Array<Region> checked) {
+        int result = 1;
+        for (int i : region.getNeighboringRegions()) {
+            Region neighbor = regionMap.get(i);
+            if (neighbor.getTeam() == region.getTeam() && !checked.contains(neighbor, false)) {
+                checked.add(neighbor);
+                result += regionDepth(neighbor, checked);
+            }
+        }
+        return result;
     }
 
     private void createMap(int numPlayers) {
@@ -96,6 +123,7 @@ public class GameBoard {
             Region region = new Region(regionId);
             region.setTeam(regionId % numPlayers);
             region.addHexagon(hexagon);
+            region.addDice(MathUtils.random(1, 3));
             hexToRegionMap.put(hexagon, regionId);
 
             Array<Hexagon> neighbors = hexagon.getNeighbors();

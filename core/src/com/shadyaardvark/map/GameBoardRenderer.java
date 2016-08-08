@@ -1,18 +1,20 @@
 package com.shadyaardvark.map;
 
-import static com.shadyaardvark.Settings.LINE_WIDTH;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.shadyaardvark.Settings.LINE_WIDTH;
 
 public class GameBoardRenderer {
     private static final Color[] COLORS =
@@ -21,6 +23,9 @@ public class GameBoardRenderer {
     private static final short[] INDEX = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 1};
 
     private ShapeRenderer hexRenderer;
+    private SpriteBatch fontRenderer;
+    private BitmapFont font;
+
     private GameBoard gameBoard;
     private IntMap<Array<Vector2>> outlines;
     private Array<Vector2> points;
@@ -30,6 +35,9 @@ public class GameBoardRenderer {
         hexRenderer = new ShapeRenderer();
         outlines = new IntMap<>();
         points = new Array<>();
+
+        fontRenderer = new SpriteBatch();
+        font = new BitmapFont();
 
         for (Region region : gameBoard.getRegionMap().values()) {
             outlines.put(region.getId(),
@@ -73,6 +81,14 @@ public class GameBoardRenderer {
             }
         }
         hexRenderer.end();
+
+        fontRenderer.setProjectionMatrix(camera.combined);
+        fontRenderer.begin();
+        for (Region region : gameBoard.getRegionMap().values()) {
+            Vector2 pos = gameBoard.getHexagonMap().getHexCenter(region.getHexagons().first());
+            font.draw(fontRenderer, Integer.toString(region.getDice()), pos.x, pos.y);
+        }
+        fontRenderer.end();
     }
 
     public void dispose() {

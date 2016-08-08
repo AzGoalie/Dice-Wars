@@ -1,15 +1,12 @@
 package com.shadyaardvark.hex;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.cos;
-import static java.lang.Math.round;
-import static java.lang.Math.sin;
-
-import java.util.Map;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+
+import java.util.Map;
+
+import static java.lang.Math.*;
 
 public class HexagonMap {
     private final Map<Vector2, Hexagon> hexagons;
@@ -21,7 +18,7 @@ public class HexagonMap {
     private final ObjectMap<Hexagon, HexInfo> hexInfo;
 
     HexagonMap(Map<Vector2, Hexagon> hexagons, Orientation orientation, Vector2 origin,
-            Vector2 hexSize) {
+               Vector2 hexSize) {
         this.hexagons = hexagons;
         this.orientation = orientation;
         this.origin = origin;

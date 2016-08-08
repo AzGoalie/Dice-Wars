@@ -1,10 +1,10 @@
 package com.shadyaardvark.hex.layouts;
 
-import java.util.HashMap;
-
 import com.badlogic.gdx.math.Vector2;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.Layout;
+
+import java.util.HashMap;
 
 public class ParallelogramLayout implements Layout {
     @Override
