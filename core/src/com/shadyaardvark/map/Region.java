@@ -1,10 +1,10 @@
 package com.shadyaardvark.map;
 
-import com.badlogic.gdx.utils.Array;
-import com.shadyaardvark.hex.Hexagon;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import com.badlogic.gdx.utils.Array;
+import com.shadyaardvark.hex.Hexagon;
 
 public class Region {
     private final int id;
@@ -61,10 +61,14 @@ public class Region {
         return dice;
     }
 
-    public void addDice(int diceToAdd) {
-        dice += diceToAdd;
-        if (dice > 6) {
-            dice = 6;
+    public void setDice(int dice) {
+        this.dice = dice;
+        if (this.dice > 6) {
+            this.dice = 6;
+        }
+
+        if (this.dice < 1) {
+            this.dice = 1;
         }
     }
 

@@ -1,5 +1,11 @@
 package com.shadyaardvark.map;
 
+import static com.shadyaardvark.Settings.HEX_HEIGHT;
+import static com.shadyaardvark.Settings.HEX_WIDTH;
+import static com.shadyaardvark.Settings.MAP_HEIGHT;
+import static com.shadyaardvark.Settings.MAP_WIDTH;
+import static com.shadyaardvark.hex.Orientation.POINTY_TOP;
+
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -11,18 +17,20 @@ import com.shadyaardvark.hex.HexagonMap;
 import com.shadyaardvark.hex.HexagonMapBuilder;
 import com.shadyaardvark.hex.layouts.RectangleLayout;
 
-import static com.shadyaardvark.Settings.*;
-import static com.shadyaardvark.hex.Orientation.POINTY_TOP;
-
 public class GameBoard {
     private static final float PERCENT_FILLED = 0.75f;
     private IntMap<Region> regionMap;
     private ObjectMap<Hexagon, Integer> hexToRegionMap;
     private HexagonMap hexagonMap;
 
+    private int numPlayers;
+    private int currentPlayer;
+
     public GameBoard(int numPlayers) {
         regionMap = new IntMap<>();
         hexToRegionMap = new ObjectMap<>();
+        currentPlayer = 0;
+        this.numPlayers = numPlayers;
 
         createMap(numPlayers);
     }
@@ -62,6 +70,84 @@ public class GameBoard {
         }
 
         return max;
+    }
+
+    public boolean attack(Region attacker, Region defender) {
+        if (attacker.getDice() == 1 || !attacker.getNeighboringRegions()
+                .contains(defender.getId()) || attacker.getTeam() == defender.getTeam()) {
+            return false;
+        }
+
+        int attackTotal = 0;
+        int defendTotal = 0;
+
+        for (int i = 0; i < attacker.getDice(); i++) {
+            attackTotal += MathUtils.random(1,6);
+        }
+
+        for (int i = 0; i < defender.getDice(); i++) {
+            defendTotal += MathUtils.random(1,6);
+        }
+
+        if (attackTotal > defendTotal) {
+            defender.setTeam(attacker.getTeam());
+            defender.setDice(attacker.getDice()-1);
+            attacker.setDice(1);
+            return true;
+        }
+
+        attacker.setDice(1);
+        return false;
+    }
+
+    public void endTurn() {
+        currentPlayer = (currentPlayer + 1) % numPlayers;
+
+        if (currentPlayer == 0) {
+            for (int i = 0; i < numPlayers; i++) {
+                distributeDice(i, calcLongestChain(i));
+            }
+        }
+    }
+
+    public Array<Region> getTeamRegions(int team) {
+        Array<Region> regions = new Array<>();
+
+        for (Region region : regionMap.values()) {
+            if (region.getTeam() == team) {
+                regions.add(region);
+            }
+        }
+
+        return regions;
+    }
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public IntMap<Region> getRegionMap() {
+        return regionMap;
+    }
+
+    public HexagonMap getHexagonMap() {
+        return hexagonMap;
+    }
+
+    private void distributeDice(int team, int dice) {
+        Array<Region> regions = getTeamRegions(team);
+        int size = regions.size;
+        int full = 0;
+        while (dice > 0 && full != size) {
+            Region region = regions.random();
+            if (region.getDice() != 6) {
+                region.setDice(region.getDice() + 1);
+                dice--;
+            } else {
+                full++;
+                regions.removeValue(region, true);
+            }
+        }
     }
 
     private int regionDepth(Region region, Array<Region> checked) {
@@ -123,7 +209,7 @@ public class GameBoard {
             Region region = new Region(regionId);
             region.setTeam(regionId % numPlayers);
             region.addHexagon(hexagon);
-            region.addDice(MathUtils.random(1, 3));
+            region.setDice(MathUtils.random(1, 3));
             hexToRegionMap.put(hexagon, regionId);
 
             Array<Hexagon> neighbors = hexagon.getNeighbors();
@@ -154,13 +240,5 @@ public class GameBoard {
                 }
             }
         }
-    }
-
-    IntMap<Region> getRegionMap() {
-        return regionMap;
-    }
-
-    HexagonMap getHexagonMap() {
-        return hexagonMap;
     }
 }
