@@ -9,4 +9,7 @@ public class Settings {
 
     public static final int MAP_WIDTH = 10;
     public static final int MAP_HEIGHT = 10;
+    public static final int HEX_WIDTH = 20;
+    public static final int HEX_HEIGHT = 20;
+    public static final int LINE_WIDTH = 1;
 }
