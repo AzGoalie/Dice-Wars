@@ -1,19 +1,16 @@
 package com.shadyaardvark.screens;
 
-import static com.shadyaardvark.Settings.HEX_HEIGHT;
-import static com.shadyaardvark.Settings.HEX_WIDTH;
-import static com.shadyaardvark.Settings.MAP_HEIGHT;
-import static com.shadyaardvark.Settings.MAP_WIDTH;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.shadyaardvark.DiceWars;
@@ -31,16 +28,13 @@ public class MainMenu implements Screen {
     public MainMenu(DiceWars diceWars) {
         this.game = diceWars;
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false,
-                HEX_WIDTH * 2f * (MAP_WIDTH - .75f),
-                HEX_HEIGHT * 1.5f * (MAP_HEIGHT + 3f));
-        camera.position.y -= (HEX_HEIGHT * 1.5f * (MAP_HEIGHT + 3f)) - (HEX_HEIGHT * 1.5f * (MAP_HEIGHT + .5f));
+        camera = diceWars.getCamera();
 
         gameBoard = new GameBoard(5);
-        renderer = new GameBoardRenderer(gameBoard);
+        final BitmapFont font = diceWars.getAssetManager().get("helvetica50.fnt");
+        renderer = new GameBoardRenderer(gameBoard, font);
 
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        Skin skin = diceWars.getAssetManager().get("uiskin.json");
         stage = new Stage();
 
         Table table = new Table(skin);
@@ -60,12 +54,12 @@ public class MainMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 gameBoard = new GameBoard(5);
-                renderer = new GameBoardRenderer(gameBoard);
+                renderer = new GameBoardRenderer(gameBoard, font);
             }
         });
 
-        table.add(start);
-        table.add(newMap);
+        table.add(start).size(100, 100);
+        table.add(newMap).size(100, 100);
         stage.addActor(table);
 
         Gdx.input.setInputProcessor(stage);
@@ -91,7 +85,7 @@ public class MainMenu implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height);
     }
 
     @Override
@@ -111,6 +105,7 @@ public class MainMenu implements Screen {
 
     @Override
     public void dispose() {
-
+        renderer.dispose();
+        stage.dispose();
     }
 }

@@ -23,9 +23,9 @@ public enum Orientation {
             sqrt(3.0) / 3.0,
             0.0);
 
-    public double f0, f1, f2, f3;
-    public double b0, b1, b2, b3;
-    public double startAngle;
+    public final double f0, f1, f2, f3;
+    public final double b0, b1, b2, b3;
+    public final double startAngle;
 
     Orientation(double f0, double f1, double f2, double f3,
                 double b0, double b1, double b2, double b3,

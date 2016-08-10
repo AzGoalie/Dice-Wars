@@ -106,7 +106,7 @@ public class HexagonMap {
         return info;
     }
 
-    private class HexInfo {
+    private static class HexInfo {
         public Vector2 center;
         public Array<Vector2> corners;
     }

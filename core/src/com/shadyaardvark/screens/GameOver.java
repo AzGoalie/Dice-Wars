@@ -19,11 +19,11 @@ public class GameOver implements Screen {
     private Camera camera;
     private Stage stage;
 
-    public GameOver(final DiceWars diceWars, GameBoardRenderer renderer, Camera camera, int winner) {
+    public GameOver(final DiceWars diceWars, GameBoardRenderer renderer, int winner) {
         this.renderer = renderer;
-        this.camera = camera;
+        this.camera = diceWars.getCamera();
 
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        Skin skin = diceWars.getAssetManager().get("uiskin.json");
         stage = new Stage();
 
         Dialog dialog = new Dialog("", skin);
@@ -63,7 +63,7 @@ public class GameOver implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        stage.getViewport().update(width, height);
     }
 
     @Override
@@ -83,6 +83,7 @@ public class GameOver implements Screen {
 
     @Override
     public void dispose() {
-
+        renderer.dispose();
+        stage.dispose();
     }
 }

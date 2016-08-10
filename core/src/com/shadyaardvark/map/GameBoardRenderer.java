@@ -5,10 +5,10 @@ import static com.shadyaardvark.Settings.LINE_WIDTH;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.DistanceFieldFont;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -25,24 +25,22 @@ public class GameBoardRenderer {
 
     private ShapeRenderer hexRenderer;
     private SpriteBatch fontRenderer;
-    private DistanceFieldFont font;
+    private BitmapFont font;
     private GameBoard gameBoard;
     private IntMap<Array<Vector2>> outlines;
     private Array<Vector2> points;
 
-    public GameBoardRenderer(GameBoard board) {
+    public GameBoardRenderer(GameBoard board, BitmapFont font) {
         this.gameBoard = board;
         hexRenderer = new ShapeRenderer();
         outlines = new IntMap<>();
         points = new Array<>();
 
         fontRenderer = new SpriteBatch();
-        fontRenderer.setShader(DistanceFieldFont.createDistanceFieldShader());
-
-        font = new DistanceFieldFont(Gdx.files.internal("verdana39distancefield.fnt"));
-        font.getData().setScale(.25f);
-        font.setDistanceFieldSmoothing(5);
-        font.setColor(Color.BLACK);
+        this.font = font;
+        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        this.font.getData().setScale(.4f);
+        this.font.setColor(Color.BLACK);
 
 
         for (Region region : gameBoard.getRegionMap().values()) {
@@ -92,7 +90,7 @@ public class GameBoardRenderer {
         fontRenderer.begin();
         for (Region region : gameBoard.getRegionMap().values()) {
             Vector2 pos = gameBoard.getHexagonMap().getHexCenter(region.getHexagons().first());
-            font.draw(fontRenderer, Integer.toString(region.getDice()), pos.x-3, pos.y+4);
+            font.draw(fontRenderer, String.valueOf(region.getDice()), pos.x-5, pos.y+8);
         }
         fontRenderer.end();
     }
@@ -100,7 +98,6 @@ public class GameBoardRenderer {
     public void dispose() {
         hexRenderer.dispose();
         fontRenderer.dispose();
-        font.dispose();
     }
 
     private Array<Vector2> createOutline(HexagonMap map, Array<Hexagon> hexagons) {

@@ -15,7 +15,7 @@ public class RectangleLayout implements Layout {
         HashMap<Vector2, Hexagon> map = new HashMap<>();
 
         for (int r = 0; r < height; r++) {
-            int rOffset = floor(r / 2);
+            int rOffset = floor(r / 2f);
             for (int q = -rOffset; q < width - rOffset; q++) {
                 map.put(new Vector2(q, r), new Hexagon(q, r));
             }

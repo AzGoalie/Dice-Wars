@@ -33,8 +33,7 @@ public class PlayerInput extends InputAdapter {
                     lastRegionClicked = clicked;
                     gameBoard.highlightNeighbors(lastRegionClicked, true);
                 }
-            } else if (clicked.getNeighboringRegions()
-                    .contains(lastRegionClicked.getId())) {
+            } else if (clicked.getNeighboringRegions().contains(lastRegionClicked, false)) {
                 gameBoard.highlightNeighbors(lastRegionClicked, false);
                 gameBoard.attack(lastRegionClicked, clicked);
                 lastRegionClicked = null;

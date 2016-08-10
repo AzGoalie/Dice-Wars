@@ -1,20 +1,18 @@
 package com.shadyaardvark.screens;
 
-import static com.shadyaardvark.Settings.HEX_HEIGHT;
-import static com.shadyaardvark.Settings.HEX_WIDTH;
-import static com.shadyaardvark.Settings.MAP_HEIGHT;
-import static com.shadyaardvark.Settings.MAP_WIDTH;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -36,6 +34,7 @@ public class LocalGame implements Screen {
 
     private Stage uiStage;
     private TextButton endTurn;
+    private Array<Label> largestChainLabels;
 
     private Array<Player> players;
 
@@ -43,13 +42,10 @@ public class LocalGame implements Screen {
         this.game = diceWars;
 
         this.board = gameBoard;
-        boardRenderer = new GameBoardRenderer(gameBoard);
+        BitmapFont font = diceWars.getAssetManager().get("helvetica50.fnt");
+        boardRenderer = new GameBoardRenderer(gameBoard, font);
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false,
-                HEX_WIDTH * 2f * (MAP_WIDTH - .75f),
-                HEX_HEIGHT * 1.5f * (MAP_HEIGHT + 3f));
-        camera.position.y -= (HEX_HEIGHT * 1.5f * (MAP_HEIGHT + 3f)) - (HEX_HEIGHT * 1.5f * (MAP_HEIGHT + .5f));
+        camera = diceWars.getCamera();
 
         players = new Array<>();
         players.add(new LocalPlayer(0));
@@ -58,11 +54,11 @@ public class LocalGame implements Screen {
             players.add(new AI(i));
         }
 
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        Skin skin = diceWars.getAssetManager().get("uiskin.json");
         uiStage = new Stage();
         Table table = new Table(skin);
         table.setFillParent(true);
-        table.align(Align.center | Align.bottom);
+        table.align(Align.bottom | Align.left);
 
         endTurn = new TextButton("End Turn", skin);
         endTurn.addListener(new ClickListener() {
@@ -72,7 +68,17 @@ public class LocalGame implements Screen {
             }
         });
 
-        table.add(endTurn);
+        table.add(endTurn).size(100, 100).padRight(10);
+
+        largestChainLabels = new Array<>();
+        VerticalGroup group = new VerticalGroup();
+        for (int i = 0; i < 5; i++) {
+            Label label = new Label("Player " + i + " largest chain: " + board.calcLongestChain(i), skin);
+            largestChainLabels.add(label);
+            group.addActor(label);
+        }
+
+        table.add(group);
         uiStage.addActor(table);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer(new PlayerInput(board, camera), uiStage);
@@ -86,8 +92,12 @@ public class LocalGame implements Screen {
 
     @Override
     public void render(float delta) {
+        for (int i = 0; i < largestChainLabels.size; i++) {
+            largestChainLabels.get(i).setText("Player " + i + " largest chain: " + board.calcLongestChain(i));
+        }
+
         if (checkWinCondition()) {
-            game.setScreen(new GameOver(game, boardRenderer, camera, board.getRegionMap().get(1).getTeam()));
+            game.setScreen(new GameOver(game, boardRenderer, board.getRegionMap().get(1).getTeam()));
         }
 
         Gdx.gl.glClearColor(.3f, .3f, .3f, 1);
@@ -116,6 +126,7 @@ public class LocalGame implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        uiStage.getViewport().update(width, height);
     }
 
     @Override
@@ -136,5 +147,6 @@ public class LocalGame implements Screen {
     @Override
     public void dispose() {
         boardRenderer.dispose();
+        uiStage.dispose();
     }
 }

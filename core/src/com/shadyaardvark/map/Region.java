@@ -1,22 +1,20 @@
 package com.shadyaardvark.map;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.shadyaardvark.hex.Hexagon;
 
-public class Region {
+public class Region implements Comparable<Region> {
     private final int id;
     private int team;
     private boolean highlight;
-    private Set<Integer> neighboringRegions;
+    private Array<Region> neighboringRegions;
     private Array<Hexagon> hexagons;
     private int dice;
 
     public Region(int id) {
         this.id = id;
-        neighboringRegions = new HashSet<>();
+        neighboringRegions = new Array<>();
         hexagons = new Array<>();
         dice = 0;
     }
@@ -37,7 +35,7 @@ public class Region {
         return highlight;
     }
 
-    public Set<Integer> getNeighboringRegions() {
+    public Array<Region> getNeighboringRegions() {
         return neighboringRegions;
     }
 
@@ -53,8 +51,12 @@ public class Region {
         hexagons.add(hexagon);
     }
 
-    public void addNeighborRegion(int neighbor) {
-        neighboringRegions.add(neighbor);
+    public void addNeighborRegion(Region neighbor) {
+        ObjectSet<Region> regionSet = new ObjectSet<>();
+        regionSet.addAll(neighboringRegions);
+        regionSet.add(neighbor);
+
+        neighboringRegions = regionSet.iterator().toArray();
     }
 
     public int getDice() {
@@ -72,7 +74,8 @@ public class Region {
         }
     }
 
-    public boolean isValid() {
-        return id != 0;
+    @Override
+    public int compareTo(Region o) {
+        return dice - o.dice;
     }
 }

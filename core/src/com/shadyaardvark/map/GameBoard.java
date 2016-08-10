@@ -20,7 +20,7 @@ import com.shadyaardvark.hex.layouts.RectangleLayout;
 public class GameBoard {
     private static final float PERCENT_FILLED = 0.75f;
     private IntMap<Region> regionMap;
-    private ObjectMap<Hexagon, Integer> hexToRegionMap;
+    private ObjectMap<Hexagon, Region> hexToRegionMap;
     private HexagonMap hexagonMap;
 
     private int numPlayers;
@@ -36,22 +36,16 @@ public class GameBoard {
     }
 
     public void highlightNeighbors(Region region, boolean highlight) {
-        for (int neighbor : region.getNeighboringRegions()) {
-            Region neighboringRegion = regionMap.get(neighbor);
-            if (neighboringRegion.getTeam() != region.getTeam()) {
-                neighboringRegion.setHighlight(highlight);
+        for (Region neighbor : region.getNeighboringRegions()) {
+            if (neighbor.getTeam() != region.getTeam()) {
+                neighbor.setHighlight(highlight);
             }
         }
     }
 
     public Region getRegion(float x, float y) {
         Hexagon hexagon = hexagonMap.pixelToHexagon(x, y);
-        Integer i = hexToRegionMap.get(hexagon);
-        if (i != null) {
-            return regionMap.get(i);
-        } else {
-            return null;
-        }
+        return hexToRegionMap.get(hexagon);
     }
 
     public int calcLongestChain(int team) {
@@ -73,8 +67,9 @@ public class GameBoard {
     }
 
     public boolean attack(Region attacker, Region defender) {
-        if (attacker.getDice() == 1 || !attacker.getNeighboringRegions()
-                .contains(defender.getId()) || attacker.getTeam() == defender.getTeam()) {
+        if (attacker.getDice() == 1
+                || !attacker.getNeighboringRegions().contains(defender, false)
+                || attacker.getTeam() == defender.getTeam()) {
             return false;
         }
 
@@ -152,8 +147,7 @@ public class GameBoard {
 
     private int regionDepth(Region region, Array<Region> checked) {
         int result = 1;
-        for (int i : region.getNeighboringRegions()) {
-            Region neighbor = regionMap.get(i);
+        for (Region neighbor : region.getNeighboringRegions()) {
             if (neighbor.getTeam() == region.getTeam() && !checked.contains(neighbor, false)) {
                 checked.add(neighbor);
                 result += regionDepth(neighbor, checked);
@@ -210,14 +204,14 @@ public class GameBoard {
             region.setTeam(regionId % numPlayers);
             region.addHexagon(hexagon);
             region.setDice(MathUtils.random(1, 3));
-            hexToRegionMap.put(hexagon, regionId);
+            hexToRegionMap.put(hexagon, region);
 
             Array<Hexagon> neighbors = hexagon.getNeighbors();
             neighbors.shuffle();
             for (Hexagon neighbor : neighbors) {
                 if (hexagons.contains(neighbor, false) && MathUtils.random() >= .75f) {
                     region.addHexagon(neighbor);
-                    hexToRegionMap.put(neighbor, regionId);
+                    hexToRegionMap.put(neighbor, region);
                     hexagons.removeValue(neighbor, false);
                 }
             }
