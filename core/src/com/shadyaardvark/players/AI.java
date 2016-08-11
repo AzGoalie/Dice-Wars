@@ -20,6 +20,7 @@ public class AI implements Player {
 		sense();
 	}
 	
+	// The AI get's information about the board before thinking on it
 	public void sense(GameBoard board){
 			for(Region region : board.getTeamRegions(team)){
 			if(region.getDice() != 1){
@@ -29,6 +30,7 @@ public class AI implements Player {
 		board.endTurn();
 	}
 	
+	// The AI thinks about how it will act
 	public void think(Region region, GameBoard board){
 		if(region.getDice() == 1){
 			return;
@@ -44,6 +46,7 @@ public class AI implements Player {
 		}
 	}
 	
+	// The AI's actions
 	public void act(GameBoard board, Region region, Region neighbor){
 		if(board.attack(region,neighbor)){
 			think(neighbor,board);
