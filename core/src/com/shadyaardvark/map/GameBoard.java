@@ -96,13 +96,8 @@ public class GameBoard {
     }
 
     public void endTurn() {
+        distributeDice(currentPlayer, calcLongestChain(currentPlayer));
         currentPlayer = (currentPlayer + 1) % numPlayers;
-
-        if (currentPlayer == 0) {
-            for (int i = 0; i < numPlayers; i++) {
-                distributeDice(i, calcLongestChain(i));
-            }
-        }
     }
 
     public Array<Region> getTeamRegions(int team) {
