@@ -8,14 +8,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.shadyaardvark.DiceWars;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.GameBoardRenderer;
@@ -55,7 +52,8 @@ public class LocalGame implements Screen {
         }
 
         Skin skin = diceWars.getAssetManager().get("uiskin.json");
-        uiStage = new Stage();
+        uiStage = new Stage(new StretchViewport(camera.viewportWidth, camera.viewportHeight));
+
         Table table = new Table(skin);
         table.setFillParent(true);
         table.align(Align.bottom | Align.left);
@@ -68,7 +66,7 @@ public class LocalGame implements Screen {
             }
         });
 
-        table.add(endTurn).size(100, 100).padRight(10);
+        table.add(endTurn).align(Align.bottomLeft).padRight(10);
 
         largestChainLabels = new Array<>();
         VerticalGroup group = new VerticalGroup();
@@ -78,6 +76,7 @@ public class LocalGame implements Screen {
             group.addActor(label);
         }
 
+        group.setScale(0.5f);
         table.add(group);
         uiStage.addActor(table);
 
