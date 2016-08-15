@@ -1,7 +1,8 @@
+package com.shadyaardvark.players;
+
 import com.badlogic.gdx.utils.Array;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.Region;
-import com.shadyaardvark.players;
 
 public class AI implements Player {
     
