@@ -12,6 +12,10 @@ launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
+robovm {
+    iosSignIdentity = "iPhone Distribution: Travis McMahon (YA79E68BVB)"
+    iosProvisioningProfile = "Dice Wars Dist"
+}
 
 eclipse.project {
     name = appName + "-ios"
