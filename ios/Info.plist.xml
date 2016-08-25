@@ -3,6 +3,8 @@
         "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+        <key>ITSAppUsesNonExemptEncryption</key>
+        <false/>
         <key>UIRequiresFullScreen</key>
         <true/>
         <key>MinimumOSVersion</key>
@@ -57,9 +59,9 @@
                 <array>
                     <string>Icon</string>
                     <string>Icon-72</string>
-                    <string>Icon-76</string> //add here
-                    <string>Icon-120</string> //add here
-                    <string>Icon-152</string> //add here
+                    <string>Icon-76</string>
+                    <string>Icon-120</string>
+                    <string>Icon-152</string>
                 </array>
             </dict>
         </dict>
