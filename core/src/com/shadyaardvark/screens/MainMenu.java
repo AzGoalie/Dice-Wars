@@ -10,12 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.shadyaardvark.DiceWars;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.GameBoardRenderer;
+
+import static com.shadyaardvark.Settings.HEIGHT_PERCENT;
 
 public class MainMenu implements Screen {
     private DiceWars game;
@@ -39,7 +41,8 @@ public class MainMenu implements Screen {
 
         Table table = new Table(skin);
         table.setFillParent(true);
-        table.align(Align.center | Align.bottom);
+        table.bottom();
+        table.debug();
 
         TextButton start = new TextButton("Play", skin);
         start.addListener(new ClickListener() {
@@ -58,8 +61,10 @@ public class MainMenu implements Screen {
             }
         });
 
+        table.defaults().uniformX().expandX().fillX()
+                .height(Value.percentHeight(HEIGHT_PERCENT, table));
         table.add(start);
-        table.add(newMap);
+        table.add(newMap).bottom();
         stage.addActor(table);
 
         Gdx.input.setInputProcessor(stage);

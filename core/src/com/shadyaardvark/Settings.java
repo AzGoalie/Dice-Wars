@@ -12,4 +12,6 @@ public class Settings {
     public static final int HEX_WIDTH = 20;
     public static final int HEX_HEIGHT = 20;
     public static final int LINE_WIDTH = 1;
+
+    public static final float HEIGHT_PERCENT = 0.18f;
 }
