@@ -1,10 +1,5 @@
 package com.shadyaardvark.map;
 
-import static com.shadyaardvark.Settings.LINE_WIDTH;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,12 +12,13 @@ import com.badlogic.gdx.utils.IntMap;
 import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.hex.HexagonMap;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.shadyaardvark.Settings.LINE_WIDTH;
+import static com.shadyaardvark.map.HexMesh.COLORS;
+
 public class GameBoardRenderer {
-    private static final Color[] COLORS =
-            {Color.valueOf("AA2FFF"), Color.valueOf("01B0F0"), Color.valueOf("97FF7F"), Color.valueOf("E8A241"), Color.valueOf("FF5757")};
-
-    private static final short[] INDEX = {0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 1};
-
     private ShapeRenderer hexRenderer;
     private SpriteBatch fontRenderer;
     private BitmapFont font;
@@ -30,16 +26,15 @@ public class GameBoardRenderer {
     private IntMap<Array<Vector2>> outlines;
     private Array<Vector2> points;
 
-    public GameBoardRenderer(GameBoard board, BitmapFont font) {
+    public GameBoardRenderer(GameBoard board, BitmapFont font, ShapeRenderer shapeRenderer, SpriteBatch spriteBatch) {
         this.gameBoard = board;
-        hexRenderer = new ShapeRenderer();
+        hexRenderer = shapeRenderer;
         outlines = new IntMap<>();
         points = new Array<>();
 
-        fontRenderer = new SpriteBatch();
+        fontRenderer = spriteBatch;
         this.font = font;
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        this.font.getData().setScale(.4f);
         this.font.setColor(Color.BLACK);
 
 
@@ -65,15 +60,7 @@ public class GameBoardRenderer {
                 points.add(gameBoard.getHexagonMap().getHexCenter(hexagon));
                 points.addAll(gameBoard.getHexagonMap().getHexCorners(hexagon));
 
-                // Draw each triangle in the hexagon
-                for (int i = 0; i < INDEX.length; i += 3) {
-                    hexRenderer.triangle(points.get(INDEX[i]).x,
-                            points.get(INDEX[i]).y,
-                            points.get(INDEX[i + 1]).x,
-                            points.get(INDEX[i + 1]).y,
-                            points.get(INDEX[i + 2]).x,
-                            points.get(INDEX[i + 2]).y);
-                }
+                HexMesh.draw(hexRenderer, points);
             }
 
             // Draw outline
@@ -90,7 +77,7 @@ public class GameBoardRenderer {
         fontRenderer.begin();
         for (Region region : gameBoard.getRegionMap().values()) {
             Vector2 pos = gameBoard.getHexagonMap().getHexCenter(region.getHexagons().first());
-            font.draw(fontRenderer, String.valueOf(region.getDice()), pos.x-5, pos.y+8);
+            font.draw(fontRenderer, String.valueOf(region.getDice()), pos.x - 5, pos.y + 8);
         }
         fontRenderer.end();
     }

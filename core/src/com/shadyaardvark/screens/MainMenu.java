@@ -33,16 +33,15 @@ public class MainMenu implements Screen {
         camera = diceWars.getCamera();
 
         gameBoard = new GameBoard(5);
-        final BitmapFont font = diceWars.getAssetManager().get("helvetica50.fnt");
-        renderer = new GameBoardRenderer(gameBoard, font);
+        final BitmapFont font = diceWars.getFont();
+        renderer = new GameBoardRenderer(gameBoard, font, game.getShapeRenderer(), game.getSpriteBatch());
 
-        Skin skin = diceWars.getAssetManager().get("uiskin.json");
+        Skin skin = diceWars.getSkin();
         stage = new Stage(new StretchViewport(camera.viewportWidth, camera.viewportHeight));
 
         Table table = new Table(skin);
         table.setFillParent(true);
         table.bottom();
-        table.debug();
 
         TextButton start = new TextButton("Play", skin);
         start.addListener(new ClickListener() {
@@ -57,7 +56,7 @@ public class MainMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 gameBoard = new GameBoard(5);
-                renderer = new GameBoardRenderer(gameBoard, font);
+                renderer = new GameBoardRenderer(gameBoard, font, game.getShapeRenderer(), game.getSpriteBatch());
             }
         });
 
@@ -110,7 +109,6 @@ public class MainMenu implements Screen {
 
     @Override
     public void dispose() {
-        renderer.dispose();
         stage.dispose();
     }
 }

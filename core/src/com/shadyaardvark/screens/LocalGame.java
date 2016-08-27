@@ -6,6 +6,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -14,13 +16,17 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.shadyaardvark.DiceWars;
+import com.shadyaardvark.hex.Hexagon;
 import com.shadyaardvark.map.GameBoard;
 import com.shadyaardvark.map.GameBoardRenderer;
+import com.shadyaardvark.map.HexMesh;
 import com.shadyaardvark.map.Region;
 import com.shadyaardvark.players.AI;
 import com.shadyaardvark.players.LocalPlayer;
 import com.shadyaardvark.players.Player;
 import com.shadyaardvark.players.PlayerInput;
+
+import static com.shadyaardvark.Settings.HEIGHT_PERCENT;
 
 public class LocalGame implements Screen {
     private DiceWars game;
@@ -31,16 +37,17 @@ public class LocalGame implements Screen {
 
     private Stage uiStage;
     private TextButton endTurn;
-    private Array<Label> largestChainLabels;
 
     private Array<Player> players;
+    private Array<Hexagon> chains;
+    private BitmapFont font;
 
     public LocalGame(DiceWars diceWars, final GameBoard gameBoard) {
         this.game = diceWars;
-
         this.board = gameBoard;
-        BitmapFont font = diceWars.getAssetManager().get("helvetica50.fnt");
-        boardRenderer = new GameBoardRenderer(gameBoard, font);
+        this.font = diceWars.getFont();
+
+        boardRenderer = new GameBoardRenderer(gameBoard, font, game.getShapeRenderer(), game.getSpriteBatch());
 
         camera = diceWars.getCamera();
 
@@ -51,12 +58,17 @@ public class LocalGame implements Screen {
             players.add(new AI(i));
         }
 
+        chains = new Array<>();
+        for (int i = 0; i < 5; i++) {
+            chains.add(new Hexagon(i + 5, -2));
+        }
+
         Skin skin = diceWars.getAssetManager().get("uiskin.json");
         uiStage = new Stage(new StretchViewport(camera.viewportWidth, camera.viewportHeight));
 
         Table table = new Table(skin);
         table.setFillParent(true);
-        table.align(Align.bottom | Align.left);
+        table.align(Align.bottomLeft);
 
         endTurn = new TextButton("End Turn", skin);
         endTurn.addListener(new ClickListener() {
@@ -66,18 +78,12 @@ public class LocalGame implements Screen {
             }
         });
 
-        table.add(endTurn).align(Align.bottomLeft).padRight(10);
+        table.add(endTurn).height(Value.percentHeight(HEIGHT_PERCENT, table))
+                .bottom().padRight(5);
 
-        largestChainLabels = new Array<>();
-        VerticalGroup group = new VerticalGroup();
-        for (int i = 0; i < 5; i++) {
-            Label label = new Label("Player " + i + " largest chain: " + board.calcLongestChain(i), skin);
-            largestChainLabels.add(label);
-            group.addActor(label);
-        }
+        Label chainLabel = new Label("Longest \nChains", skin);
+        table.add(chainLabel);
 
-        group.setScale(0.5f);
-        table.add(group);
         uiStage.addActor(table);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer(new PlayerInput(board, camera), uiStage);
@@ -91,10 +97,6 @@ public class LocalGame implements Screen {
 
     @Override
     public void render(float delta) {
-        for (int i = 0; i < largestChainLabels.size; i++) {
-            largestChainLabels.get(i).setText("Player " + i + " largest chain: " + board.calcLongestChain(i));
-        }
-
         if (checkWinCondition()) {
             game.setScreen(new GameOver(game, boardRenderer, board.getRegionMap().get(1).getTeam()));
         }
@@ -108,6 +110,27 @@ public class LocalGame implements Screen {
         players.get(board.getCurrentPlayer()).doTurn(board);
 
         endTurn.setVisible(board.getCurrentPlayer() == 0);
+
+        game.getShapeRenderer().begin(ShapeRenderer.ShapeType.Filled);
+        for (int i = 0; i < chains.size; i++) {
+            Hexagon hexagon = chains.get(i);
+            Array<Vector2> points = new Array<>();
+            points.add(board.getHexagonMap().getHexCenter(hexagon));
+            points.addAll(board.getHexagonMap().getHexCorners(hexagon));
+
+            game.getShapeRenderer().setColor(HexMesh.COLORS[i]);
+            HexMesh.draw(game.getShapeRenderer(), points);
+        }
+        game.getShapeRenderer().end();
+
+        game.getSpriteBatch().begin();
+        for (int i = 0; i < chains.size; i++) {
+            Vector2 p = board.getHexagonMap().getHexCenter(chains.get(i));
+            int chain = board.calcLongestChain(i);
+            font.draw(game.getSpriteBatch(), String.valueOf(chain), p.x - 5, p.y + 8);
+        }
+        game.getSpriteBatch().end();
+
         uiStage.act();
         uiStage.draw();
     }
@@ -145,7 +168,6 @@ public class LocalGame implements Screen {
 
     @Override
     public void dispose() {
-        boardRenderer.dispose();
         uiStage.dispose();
     }
 }

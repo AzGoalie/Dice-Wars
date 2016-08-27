@@ -24,9 +24,8 @@ public class GameOver implements Screen {
         this.renderer = renderer;
         this.camera = diceWars.getCamera();
 
-        Skin skin = diceWars.getAssetManager().get("uiskin.json");
+        Skin skin = diceWars.getSkin();
         stage = new Stage(new StretchViewport(camera.viewportWidth, camera.viewportHeight));
-
 
         Dialog dialog = new Dialog("", skin);
         dialog.setMovable(false);
@@ -85,7 +84,6 @@ public class GameOver implements Screen {
 
     @Override
     public void dispose() {
-        renderer.dispose();
         stage.dispose();
     }
 }
